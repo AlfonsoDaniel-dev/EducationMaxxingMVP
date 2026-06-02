@@ -7,6 +7,7 @@ import type {
   SubmissionResponse,
   ReportResponse,
   CreateCourseInput,
+  AdminCreateCourseInput,
   CreateAssignmentInput,
   CreateUserInput,
 } from '@/types'
@@ -111,5 +112,22 @@ export const api = {
     listMine: (courseId: string) =>
       request<ReportResponse[]>(`/courses/${courseId}/reports/me`),
     latestMine: () => request<ReportResponse>('/reports/me/latest'),
+  },
+
+  admin: {
+    listUsers: (role?: string) =>
+      request<UserResponse[]>(`/admin/users${role ? `?role=${role}` : ''}`),
+    listAllReports: () => request<ReportResponse[]>('/admin/reports'),
+    listAllCourses: () => request<CourseResponse[]>('/admin/courses'),
+    createCourse: (data: AdminCreateCourseInput) =>
+      request<CourseResponse>('/admin/courses', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    assignProfessor: (courseId: string, professorId: string) =>
+      request<{ message: string }>(`/admin/courses/${courseId}/professor`, {
+        method: 'PUT',
+        body: JSON.stringify({ professorId }),
+      }),
   },
 }

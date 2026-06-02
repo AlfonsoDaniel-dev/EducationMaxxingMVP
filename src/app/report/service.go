@@ -103,6 +103,19 @@ func (s *ReportService) GenerateReport(input GenerateReportInputDTO) (*ReportOut
 	return recordToDTO(record), nil
 }
 
+func (s *ReportService) ListAllReports() ([]*ReportOutputDTO, error) {
+	records, err := s.repo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	dtos := make([]*ReportOutputDTO, len(records))
+	for i, r := range records {
+		dtos[i] = recordToDTO(r)
+	}
+	return dtos, nil
+}
+
 func (s *ReportService) GetReport(id string) (*ReportOutputDTO, error) {
 	uid, err := uuid.Parse(id)
 	if err != nil {

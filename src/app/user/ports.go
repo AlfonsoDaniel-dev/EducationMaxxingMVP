@@ -16,6 +16,8 @@ var (
 type UserRepository interface {
 	FindById(id uuid.UUID) (*UserRecord, error)
 	FindByEmail(email string) (*UserRecord, error)
+	FindAll() ([]*UserRecord, error)
+	FindByRole(role string) ([]*UserRecord, error)
 	Save(user *UserRecord) error
 }
 

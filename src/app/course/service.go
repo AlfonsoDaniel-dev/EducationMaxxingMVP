@@ -75,6 +75,26 @@ func (s *CourseService) ListCoursesByStudent(studentId string) ([]*CourseOutputD
 	return recordsToDTOs(records), nil
 }
 
+func (s *CourseService) ListAllCourses() ([]*CourseOutputDTO, error) {
+	records, err := s.repo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	return recordsToDTOs(records), nil
+}
+
+func (s *CourseService) AssignProfessor(courseId, professorId string) error {
+	cid, err := uuid.Parse(courseId)
+	if err != nil {
+		return ErrInvalidId
+	}
+	pid, err := uuid.Parse(professorId)
+	if err != nil {
+		return ErrInvalidId
+	}
+	return s.repo.UpdateProfessor(cid, pid)
+}
+
 func (s *CourseService) EnrollStudent(input EnrollStudentInputDTO) error {
 	courseId, err := uuid.Parse(input.CourseId)
 	if err != nil {

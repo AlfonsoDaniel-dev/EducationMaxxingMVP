@@ -17,6 +17,25 @@ func NewReportHandler(svc *appreport.ReportService) *ReportHandler {
 	return &ReportHandler{svc: svc}
 }
 
+// ListAllReports godoc
+// @Summary      List all reports (admin)
+// @Tags         admin
+// @Security     BearerAuth
+// @Produce      json
+// @Success      200 {array} appreport.ReportOutputDTO
+// @Failure      401 {object} ErrorResponse
+// @Router       /admin/reports [get]
+func (h *ReportHandler) ListAllReports(c echo.Context) error {
+	reports, err := h.svc.ListAllReports()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{err.Error()})
+	}
+	if reports == nil {
+		reports = []*appreport.ReportOutputDTO{}
+	}
+	return c.JSON(http.StatusOK, reports)
+}
+
 // GenerateReport godoc
 // @Summary      Generate academic progress report
 // @Description  Generates a new report for the authenticated student in a given course

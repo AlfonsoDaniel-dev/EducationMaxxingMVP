@@ -132,6 +132,25 @@ func (s *UserService) CreateUser(input CreateUserInputDTO) (*UserOutputDTO, erro
 	return recordToDTO(record), nil
 }
 
+func (s *UserService) ListUsers(role string) ([]*UserOutputDTO, error) {
+	var records []*UserRecord
+	var err error
+	if role == "" {
+		records, err = s.repo.FindAll()
+	} else {
+		records, err = s.repo.FindByRole(role)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	dtos := make([]*UserOutputDTO, len(records))
+	for i, r := range records {
+		dtos[i] = recordToDTO(r)
+	}
+	return dtos, nil
+}
+
 func recordToDTO(r *UserRecord) *UserOutputDTO {
 	return &UserOutputDTO{
 		Id:    r.Id.String(),

@@ -86,6 +86,28 @@ func (h *UserHandler) Me(c echo.Context) error {
 	return c.JSON(http.StatusOK, output)
 }
 
+// ListUsers godoc
+// @Summary      List users
+// @Description  List all users, optionally filtered by role (admin only)
+// @Tags         admin
+// @Security     BearerAuth
+// @Produce      json
+// @Param        role query string false "Filter by role (student|professor)"
+// @Success      200 {array} appuser.UserOutputDTO
+// @Failure      401 {object} ErrorResponse
+// @Router       /admin/users [get]
+func (h *UserHandler) ListUsers(c echo.Context) error {
+	role := c.QueryParam("role")
+	users, err := h.svc.ListUsers(role)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{err.Error()})
+	}
+	if users == nil {
+		users = []*appuser.UserOutputDTO{}
+	}
+	return c.JSON(http.StatusOK, users)
+}
+
 // CreateUser godoc
 // @Summary      Create user
 // @Description  Create a new user (admin, student, or professor)

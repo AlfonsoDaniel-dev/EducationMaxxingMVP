@@ -19,6 +19,7 @@ var (
 type ReportRepository interface {
 	Save(report *ReportRecord) error
 	FindById(id uuid.UUID) (*ReportRecord, error)
+	FindAll() ([]*ReportRecord, error)
 	FindByStudentAndCourse(studentId, courseId uuid.UUID) ([]*ReportRecord, error)
 	FindLatestByStudent(studentId uuid.UUID) (*ReportRecord, error)
 }

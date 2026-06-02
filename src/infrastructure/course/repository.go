@@ -47,6 +47,17 @@ func (r *InMemoryCourseRepository) FindById(id uuid.UUID) (*appcourse.CourseReco
 	return copyRecord(record), nil
 }
 
+func (r *InMemoryCourseRepository) FindAll() ([]*appcourse.CourseRecord, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	results := make([]*appcourse.CourseRecord, 0, len(r.data))
+	for _, record := range r.data {
+		results = append(results, copyRecord(record))
+	}
+	return results, nil
+}
+
 func (r *InMemoryCourseRepository) FindByProfessorId(professorId uuid.UUID) ([]*appcourse.CourseRecord, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -92,6 +103,18 @@ func (r *InMemoryCourseRepository) AddStudent(courseId, studentId uuid.UUID) err
 	}
 
 	record.StudentIds = append(record.StudentIds, studentId)
+	return nil
+}
+
+func (r *InMemoryCourseRepository) UpdateProfessor(courseId, professorId uuid.UUID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	record, ok := r.data[courseId]
+	if !ok {
+		return ErrCourseNotFound
+	}
+	record.ProfessorId = professorId
 	return nil
 }
 

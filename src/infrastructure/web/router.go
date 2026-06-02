@@ -62,6 +62,14 @@ func NewRouter(
 	protected.GET("/auth/me", userH.Me)
 	protected.POST("/users", userH.CreateUser)
 
+	// Admin-only routes
+	admin := protected.Group("/admin")
+	admin.GET("/users", userH.ListUsers)
+	admin.GET("/reports", reportH.ListAllReports)
+	admin.GET("/courses", courseH.ListAllCourses)
+	admin.POST("/courses", courseH.AdminCreateCourse)
+	admin.PUT("/courses/:id/professor", courseH.AdminAssignProfessor)
+
 	protected.POST("/courses", courseH.CreateCourse)
 	protected.GET("/courses", courseH.ListCourses)
 	protected.GET("/courses/:id", courseH.GetCourse)

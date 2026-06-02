@@ -15,27 +15,27 @@ type SubmitFilesInputDTO struct {
 }
 
 type FileOutputDTO struct {
-	Id       string
-	Name     string
-	Path     string
-	Hash     string
-	Size     int64
-	MimeType string
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Path     string `json:"path"`
+	Hash     string `json:"hash"`
+	Size     int64  `json:"size"`
+	MimeType string `json:"mimeType"`
 }
 
 type SubmissionOutputDTO struct {
-	Id                string
-	StudentId         string
-	AssignmentId      string
-	CourseId          string
-	SubmittedAt       time.Time
-	Status            string
-	Grade             *float64
-	ConfirmationToken string
-	Files             []FileOutputDTO
+	Id                string          `json:"id"`
+	StudentId         string          `json:"studentId"`
+	AssignmentId      string          `json:"assignmentId"`
+	CourseId          string          `json:"courseId"`
+	SubmittedAt       time.Time       `json:"submittedAt"`
+	Status            string          `json:"status"`
+	Grade             *float64        `json:"grade"`
+	ConfirmationToken string          `json:"confirmationToken"`
+	Files             []FileOutputDTO `json:"files"`
 }
 
 type GradeSubmissionInputDTO struct {
-	SubmissionId string
-	Grade        float64
+	SubmissionId string  `json:"submissionId"`
+	Grade        float64 `json:"grade"`
 }
