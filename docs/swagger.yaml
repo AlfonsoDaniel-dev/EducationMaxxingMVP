@@ -1,0 +1,748 @@
+basePath: /api
+definitions:
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_assignment.AssignmentOutputDTO:
+    properties:
+      courseId:
+        type: string
+      description:
+        type: string
+      fechaEntrega:
+        type: string
+      fechaPublicacion:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_course.CourseOutputDTO:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      period:
+        type: string
+      professorId:
+        type: string
+      studentIds:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_course.CreateCourseInputDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      period:
+        type: string
+      professorId:
+        type: string
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_report.ReportOutputDTO:
+    properties:
+      courseId:
+        type: string
+      generatedAt:
+        type: string
+      id:
+        type: string
+      indicadorRiesgo:
+        type: string
+      porcentajeAvance:
+        format: float64
+        type: number
+      previousReportId:
+        type: string
+      promedio:
+        format: float64
+        type: number
+      studentId:
+        type: string
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_submission.FileOutputDTO:
+    properties:
+      hash:
+        type: string
+      id:
+        type: string
+      mimeType:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        format: int64
+        type: integer
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_submission.SubmissionOutputDTO:
+    properties:
+      assignmentId:
+        type: string
+      confirmationToken:
+        type: string
+      courseId:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_submission.FileOutputDTO'
+        type: array
+      grade:
+        format: float64
+        type: number
+      id:
+        type: string
+      status:
+        type: string
+      studentId:
+        type: string
+      submittedAt:
+        type: string
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.CreateUserInputDTO:
+    properties:
+      academicProgram:
+        type: string
+      area:
+        description: Admin-specific
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      enrollmentId:
+        description: Student-specific
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      rol:
+        type: string
+      semester:
+        type: integer
+      speciality:
+        description: Professor-specific
+        type: string
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.LoginOutputDTO:
+    properties:
+      rol:
+        type: string
+      sessionToken:
+        type: string
+      userId:
+        type: string
+    type: object
+  github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.UserOutputDTO:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      rol:
+        type: string
+    type: object
+  src_infrastructure_web_handlers.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  src_infrastructure_web_handlers.createAssignmentRequest:
+    properties:
+      description:
+        type: string
+      fechaEntrega:
+        type: string
+      fechaPublicacion:
+        type: string
+      title:
+        type: string
+    type: object
+  src_infrastructure_web_handlers.enrollRequest:
+    properties:
+      studentId:
+        type: string
+    type: object
+  src_infrastructure_web_handlers.gradeRequest:
+    properties:
+      grade:
+        type: number
+    type: object
+  src_infrastructure_web_handlers.loginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API for the EducationMaxxing educational platform MVP
+  title: EducationMaxxing API
+  version: "1.0"
+paths:
+  /assignments/{assignmentId}/submissions:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload one or more files as a submission. Uses multipart/form-data.
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: assignmentId
+        required: true
+        type: string
+      - description: Files to submit
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_submission.SubmissionOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Submit files for an assignment
+      tags:
+      - submissions
+  /assignments/{id}:
+    get:
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_assignment.AssignmentOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get assignment by ID
+      tags:
+      - assignments
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: Credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/src_infrastructure_web_handlers.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.LoginOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Invalidate the current session (client must discard the token)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Returns the authenticated user's profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.UserOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /courses:
+    get:
+      description: Returns courses for the authenticated user (by professor or student
+        role)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_course.CourseOutputDTO'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List my courses
+      tags:
+      - courses
+    post:
+      consumes:
+      - application/json
+      description: Create a new course (professorId taken from JWT)
+      parameters:
+      - description: Course data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_course.CreateCourseInputDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_course.CourseOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create course
+      tags:
+      - courses
+  /courses/{courseId}/assignments:
+    get:
+      parameters:
+      - description: Course ID
+        in: path
+        name: courseId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_assignment.AssignmentOutputDTO'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List assignments by course
+      tags:
+      - assignments
+    post:
+      consumes:
+      - application/json
+      description: Create a new assignment for a course
+      parameters:
+      - description: Course ID
+        in: path
+        name: courseId
+        required: true
+        type: string
+      - description: Assignment data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/src_infrastructure_web_handlers.createAssignmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_assignment.AssignmentOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create assignment
+      tags:
+      - assignments
+  /courses/{courseId}/reports:
+    post:
+      description: Generates a new report for the authenticated student in a given
+        course
+      parameters:
+      - description: Course ID
+        in: path
+        name: courseId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_report.ReportOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Generate academic progress report
+      tags:
+      - reports
+  /courses/{courseId}/reports/me:
+    get:
+      parameters:
+      - description: Course ID
+        in: path
+        name: courseId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_report.ReportOutputDTO'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my reports for a course
+      tags:
+      - reports
+  /courses/{courseId}/submissions/me:
+    get:
+      parameters:
+      - description: Course ID
+        in: path
+        name: courseId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_submission.SubmissionOutputDTO'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my submissions for a course
+      tags:
+      - submissions
+  /courses/{id}:
+    get:
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_course.CourseOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get course by ID
+      tags:
+      - courses
+  /courses/{id}/enroll:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Student ID
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/src_infrastructure_web_handlers.enrollRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Enroll student in course
+      tags:
+      - courses
+  /reports/{id}:
+    get:
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_report.ReportOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get report by ID
+      tags:
+      - reports
+  /reports/me/latest:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_report.ReportOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my latest report
+      tags:
+      - reports
+  /submissions/{id}:
+    get:
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_submission.SubmissionOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get submission by ID
+      tags:
+      - submissions
+  /submissions/{id}/grade:
+    put:
+      consumes:
+      - application/json
+      description: Assign a grade (0-100) to a confirmed submission
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Grade
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/src_infrastructure_web_handlers.gradeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Grade a submission
+      tags:
+      - submissions
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user (admin, student, or professor)
+      parameters:
+      - description: User data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.CreateUserInputDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_AlfonsoDaniel-dev_EducationMaxxing_src_app_user.UserOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/src_infrastructure_web_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create user
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
