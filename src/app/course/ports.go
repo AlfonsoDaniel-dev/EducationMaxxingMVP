@@ -14,9 +14,11 @@ var (
 type CourseRepository interface {
 	Save(course *CourseRecord) error
 	FindById(id uuid.UUID) (*CourseRecord, error)
+	FindAll() ([]*CourseRecord, error)
 	FindByProfessorId(professorId uuid.UUID) ([]*CourseRecord, error)
 	FindByStudentId(studentId uuid.UUID) ([]*CourseRecord, error)
 	AddStudent(courseId, studentId uuid.UUID) error
+	UpdateProfessor(courseId, professorId uuid.UUID) error
 	FindStudentsByCourse(courseId uuid.UUID) ([]uuid.UUID, error)
 }
 

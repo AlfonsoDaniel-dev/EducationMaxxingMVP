@@ -80,6 +80,17 @@ func (r *InMemoryReportRepository) FindLatestByStudent(studentId uuid.UUID) (*ap
 	return copyRecord(latest), nil
 }
 
+func (r *InMemoryReportRepository) FindAll() ([]*appreport.ReportRecord, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	results := make([]*appreport.ReportRecord, 0, len(r.data))
+	for _, record := range r.data {
+		results = append(results, copyRecord(record))
+	}
+	return results, nil
+}
+
 func copyRecord(r *appreport.ReportRecord) *appreport.ReportRecord {
 	c := *r
 	if r.PreviousReportId != nil {

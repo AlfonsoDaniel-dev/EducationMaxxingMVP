@@ -50,6 +50,15 @@ func main() {
 	submissionSvc := appsubmission.NewSubmissionService(submissionRepo, fileStorage, auditLogger, assignmentRepo)
 	reportSvc     := appreport.NewReportService(reportRepo, assignmentRepo, submissionRepo)
 
+	// Seed default admin
+	_, _ = userSvc.CreateUser(appuser.CreateUserInputDTO{
+		Name:     "Admin",
+		Email:    "admin@educationmaxxing.com",
+		Password: "admin1234",
+		Rol:      "admin",
+		Area:     "technology",
+	})
+
 	// HTTP server
 	router := web.NewRouter(userSvc, courseSvc, assignmentSvc, submissionSvc, reportSvc, sessionStore)
 

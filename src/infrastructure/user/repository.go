@@ -65,4 +65,30 @@ func (r *InMemoryUserRepository) FindByEmail(email string) (*appuser.UserRecord,
 	return &copy, nil
 }
 
+func (r *InMemoryUserRepository) FindAll() ([]*appuser.UserRecord, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	results := make([]*appuser.UserRecord, 0, len(r.data))
+	for _, record := range r.data {
+		c := *record
+		results = append(results, &c)
+	}
+	return results, nil
+}
+
+func (r *InMemoryUserRepository) FindByRole(role string) ([]*appuser.UserRecord, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var results []*appuser.UserRecord
+	for _, record := range r.data {
+		if record.Rol == role {
+			c := *record
+			results = append(results, &c)
+		}
+	}
+	return results, nil
+}
+
 var _ appuser.UserRepository = &InMemoryUserRepository{}

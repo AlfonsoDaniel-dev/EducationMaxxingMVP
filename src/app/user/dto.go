@@ -1,35 +1,35 @@
 package user
 
 type LoginInputDTO struct {
-	Email    string
-	Password string
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type LoginOutputDTO struct {
-	SessionToken string
-	UserId       string
-	Rol          string
+	SessionToken string `json:"sessionToken"`
+	UserId       string `json:"userId"`
+	Rol          string `json:"rol"`
 }
 
 type CreateUserInputDTO struct {
-	Name     string
-	Email    string
-	Password string
-	Rol      string
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Rol      string `json:"rol"`
 	// Student-specific
-	EnrollmentId    string
-	AcademicProgram string
-	Semester        int
+	EnrollmentId    string `json:"enrollmentId"`
+	AcademicProgram string `json:"academicProgram"`
+	Semester        int    `json:"semester"`
 	// Professor-specific
-	Speciality string
-	Department string
+	Speciality string `json:"speciality"`
+	Department string `json:"department"`
 	// Admin-specific
-	Area string
+	Area string `json:"area"`
 }
 
 type UserOutputDTO struct {
-	Id    string
-	Name  string
-	Email string
-	Rol   string
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Rol   string `json:"rol"`
 }

@@ -71,6 +71,13 @@ export interface CreateCourseInput {
   period: string
 }
 
+export interface AdminCreateCourseInput {
+  name: string
+  description: string
+  period: string
+  professorId: string
+}
+
 export interface CreateAssignmentInput {
   title: string
   description: string

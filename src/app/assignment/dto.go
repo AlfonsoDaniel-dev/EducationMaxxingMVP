@@ -3,18 +3,18 @@ package assignment
 import "time"
 
 type CreateAssignmentInputDTO struct {
-	Title            string
-	Description      string
-	FechaPublicacion time.Time
-	FechaEntrega     time.Time
-	CourseId         string
+	Title            string    `json:"title"`
+	Description      string    `json:"description"`
+	FechaPublicacion time.Time `json:"fechaPublicacion"`
+	FechaEntrega     time.Time `json:"fechaEntrega"`
+	CourseId         string    `json:"courseId"`
 }
 
 type AssignmentOutputDTO struct {
-	Id               string
-	Title            string
-	Description      string
-	FechaPublicacion time.Time
-	FechaEntrega     time.Time
-	CourseId         string
+	Id               string    `json:"id"`
+	Title            string    `json:"title"`
+	Description      string    `json:"description"`
+	FechaPublicacion time.Time `json:"fechaPublicacion"`
+	FechaEntrega     time.Time `json:"fechaEntrega"`
+	CourseId         string    `json:"courseId"`
 }
