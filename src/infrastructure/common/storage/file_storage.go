@@ -35,3 +35,7 @@ func (s *LocalFileStorage) StoreFile(content []byte, filename, assignmentId, stu
 func (s *LocalFileStorage) DeleteFile(path string) error {
 	return os.Remove(path)
 }
+
+func (s *LocalFileStorage) ReadFile(path string) ([]byte, error) {
+	return os.ReadFile(path)
+}

@@ -250,6 +250,45 @@ func (s *SubmissionService) GetByStudentAndCourse(studentId, courseId string) ([
 	return dtos, nil
 }
 
+func (s *SubmissionService) ListByAssignment(assignmentId string) ([]*SubmissionOutputDTO, error) {
+	aid, err := uuid.Parse(assignmentId)
+	if err != nil {
+		return nil, ErrInvalidId
+	}
+
+	records, err := s.repo.FindByAssignmentId(aid)
+	if err != nil {
+		return nil, err
+	}
+
+	dtos := make([]*SubmissionOutputDTO, len(records))
+	for i, r := range records {
+		files, _ := s.repo.FindFilesBySubmission(r.Id)
+		dtos[i] = recordToDTO(r, files)
+	}
+	return dtos, nil
+}
+
+// ServeFile returns the file content, MIME type, and original file name for download.
+func (s *SubmissionService) ServeFile(fileId string) ([]byte, string, string, error) {
+	fid, err := uuid.Parse(fileId)
+	if err != nil {
+		return nil, "", "", ErrInvalidId
+	}
+
+	record, err := s.repo.FindFileById(fid)
+	if err != nil {
+		return nil, "", "", ErrSubmissionNotFound
+	}
+
+	content, err := s.fileStorage.ReadFile(record.Path)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	return content, record.MimeType, record.Name, nil
+}
+
 func domainToRecord(s *domainsubmission.Submission) *SubmissionRecord {
 	return &SubmissionRecord{
 		Id:                s.Id,
