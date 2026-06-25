@@ -41,6 +41,21 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>
 }
 
+export async function downloadFile(fileId: string, fileName: string): Promise<void> {
+  const token = getToken()
+  const res = await fetch(`${BASE}/files/${fileId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  if (!res.ok) throw new Error('Failed to download file')
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export const api = {
   auth: {
     login: (email: string, password: string) =>
@@ -103,6 +118,8 @@ export const api = {
       }),
     listMine: (courseId: string) =>
       request<SubmissionResponse[]>(`/courses/${courseId}/submissions/me`),
+    listByAssignment: (assignmentId: string) =>
+      request<SubmissionResponse[]>(`/assignments/${assignmentId}/submissions`),
   },
 
   reports: {
