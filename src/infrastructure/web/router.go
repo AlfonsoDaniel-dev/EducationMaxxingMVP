@@ -80,9 +80,11 @@ func NewRouter(
 	protected.GET("/assignments/:id", assignmentH.GetAssignment)
 
 	protected.POST("/assignments/:assignmentId/submissions", submissionH.SubmitFiles)
+	protected.GET("/assignments/:assignmentId/submissions", submissionH.ListByAssignment)
 	protected.GET("/submissions/:id", submissionH.GetSubmission)
 	protected.PUT("/submissions/:id/grade", submissionH.GradeSubmission)
 	protected.GET("/courses/:courseId/submissions/me", submissionH.GetMySubmissions)
+	protected.GET("/files/:fileId", submissionH.ServeFile)
 
 	protected.POST("/courses/:courseId/reports", reportH.GenerateReport)
 	protected.GET("/reports/:id", reportH.GetReport)

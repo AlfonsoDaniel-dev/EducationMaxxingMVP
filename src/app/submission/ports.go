@@ -24,6 +24,8 @@ type SubmissionRepository interface {
 	FindById(id uuid.UUID) (*SubmissionRecord, error)
 	FindByStudentAndAssignment(studentId, assignmentId uuid.UUID) (*SubmissionRecord, error)
 	FindByStudentAndCourse(studentId, courseId uuid.UUID) ([]*SubmissionRecord, error)
+	FindByAssignmentId(assignmentId uuid.UUID) ([]*SubmissionRecord, error)
+	FindFileById(fileId uuid.UUID) (*FileRecord, error)
 	UpdateStatus(id uuid.UUID, status string) error
 	UpdateGrade(id uuid.UUID, grade float64) error
 	UpdateConfirmationToken(id uuid.UUID, token string) error
@@ -34,6 +36,7 @@ type SubmissionRepository interface {
 type FileStoragePort interface {
 	StoreFile(content []byte, filename, assignmentId, studentId string) (path, hash string, err error)
 	DeleteFile(path string) error
+	ReadFile(path string) ([]byte, error)
 }
 
 // AssignmentLookupPort is a narrow read interface so SubmissionService can

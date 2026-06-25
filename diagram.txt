@@ -1,0 +1,638 @@
+Arquitectura del sistema EducationMaxxingMVP
+============================================
+
+Este documento describe la arquitectura backend del sistema para facilitar la creacion manual de un diagrama. El proyecto sigue una arquitectura por capas con estilo DDD/hexagonal: las reglas del dominio estan aisladas, los servicios de aplicacion coordinan casos de uso, la infraestructura implementa persistencia, autenticacion, almacenamiento y HTTP, y cmd/main.go realiza la composicion inicial.
+
+Leyenda de colores sugerida
+---------------------------
+
+Azul:
+  Capa de entrada HTTP / Web.
+  Usar para rutas, handlers, middleware y Swagger.
+
+Verde:
+  Capa de aplicacion.
+  Usar para servicios, DTOs, puertos e interfaces.
+
+Amarillo:
+  Capa de dominio.
+  Usar para entidades, value objects y errores de negocio.
+
+Morado:
+  Capa de infraestructura.
+  Usar para repositorios, almacenamiento local, JWT y adaptadores externos.
+
+Gris:
+  Capa de arranque / composicion.
+  Usar para cmd/main.go, configuracion y wiring de dependencias.
+
+Rojo:
+  Persistencia fisica temporal.
+  Usar para el directorio uploads/ con archivos enviados por estudiantes.
+
+Vista general por capas
+-----------------------
+
+1. Capa de arranque y composicion
+
+Ubicacion:
+  cmd/main.go
+
+Responsabilidad:
+  - Lee configuracion minima del entorno, principalmente JWT_SECRET.
+  - Crea las implementaciones concretas de infraestructura.
+  - Crea los servicios de aplicacion inyectando repositorios, almacenamiento y autenticacion.
+  - Registra el router HTTP.
+  - Siembra un usuario administrador inicial.
+  - Levanta el servidor en :8080.
+
+Modulos principales:
+  - main
+  - auth.NewJWTSessionStore
+  - storage.NewLocalFileStorage
+  - infrauser.NewInMemoryUserRepository
+  - infracourse.NewInMemoryCourseRepository
+  - infraassignment.NewInMemoryAssignmentRepository
+  - infrasubmission.NewInMemorySubmissionRepository
+  - infrareport.NewInMemoryReportRepository
+  - web.NewRouter
+
+Relaciones:
+  - cmd/main.go llama a infraestructura para crear adaptadores concretos.
+  - cmd/main.go llama a aplicacion para crear servicios.
+  - cmd/main.go llama a web para construir el router.
+  - cmd/main.go depende de todas las capas, pero solo para composicion inicial.
+
+2. Capa HTTP / Web
+
+Ubicacion:
+  src/infrastructure/web
+
+Responsabilidad:
+  - Expone la API REST usando Echo.
+  - Aplica middleware de autenticacion JWT.
+  - Traduce requests HTTP a DTOs de aplicacion.
+  - Traduce respuestas y errores de aplicacion a JSON.
+  - Sirve Swagger UI.
+
+Modulos principales:
+  - router.go
+    - Define rutas publicas y protegidas.
+    - Agrupa rutas bajo /api.
+    - Expone Swagger en /swagger/*.
+  - middleware/auth.go
+    - JWTAuth.
+    - Extrae Authorization: Bearer <token>.
+    - Valida el token usando SessionStore.
+    - Inserta userId en el contexto HTTP.
+  - handlers/user_handler.go
+    - Login, Logout, Me, CreateUser, ListUsers.
+  - handlers/course_handler.go
+    - CreateCourse, AdminCreateCourse, AdminAssignProfessor, GetCourse, ListCourses, ListAllCourses, EnrollStudent.
+  - handlers/assignment_handler.go
+    - CreateAssignment, ListAssignments, GetAssignment.
+  - handlers/submission_handler.go
+    - SubmitFiles, GetSubmission, GradeSubmission, ListByAssignment, ServeFile, GetMySubmissions.
+  - handlers/report_handler.go
+    - GenerateReport, GetReport, GetMyCourseReports, GetMyLatestReport, ListAllReports.
+  - handlers/errors.go
+    - ErrorResponse.
+
+Relaciones:
+  - Router llama a handlers.
+  - Handlers llaman a servicios de aplicacion.
+  - Middleware usa SessionStore para validar sesion.
+  - Handlers dependen de DTOs de aplicacion.
+
+3. Capa de aplicacion
+
+Ubicacion:
+  src/app
+
+Responsabilidad:
+  - Implementa casos de uso del sistema.
+  - Orquesta entidades de dominio, repositorios y servicios externos.
+  - Define DTOs de entrada/salida.
+  - Define puertos que la infraestructura debe implementar.
+  - Mantiene la logica de flujo entre modulos, sin depender de HTTP.
+
+Modulo src/app/user:
+  Servicio:
+    - UserService
+  Metodos principales:
+    - Login
+    - Logout
+    - GetCurrentUser
+    - GetUserById
+    - CreateUser
+    - ListUsers
+  DTOs:
+    - LoginInputDTO
+    - LoginOutputDTO
+    - CreateUserInputDTO
+    - UserOutputDTO
+  Puertos:
+    - UserRepository
+    - SessionStore
+  Registro:
+    - UserRecord
+
+Modulo src/app/course:
+  Servicio:
+    - CourseService
+  Metodos principales:
+    - CreateCourse
+    - GetCourse
+    - ListCoursesByProfessor
+    - ListCoursesByStudent
+    - ListAllCourses
+    - AssignProfessor
+    - EnrollStudent
+  DTOs:
+    - CreateCourseInputDTO
+    - CourseOutputDTO
+    - EnrollStudentInputDTO
+  Puerto:
+    - CourseRepository
+  Registro:
+    - CourseRecord
+
+Modulo src/app/assignment:
+  Servicio:
+    - AssignmentService
+  Metodos principales:
+    - CreateAssignment
+    - GetAssignment
+    - ListByCourse
+  DTOs:
+    - CreateAssignmentInputDTO
+    - AssignmentOutputDTO
+  Puerto:
+    - AssignmentRepository
+  Registro:
+    - AssignmentRecord
+
+Modulo src/app/submission:
+  Servicio:
+    - SubmissionService
+  Metodos principales:
+    - SubmitFiles
+    - GetSubmission
+    - GradeSubmission
+    - GetByStudentAndCourse
+    - ListByAssignment
+    - ServeFile
+  DTOs:
+    - FileUploadDTO
+    - SubmitFilesInputDTO
+    - FileOutputDTO
+    - SubmissionOutputDTO
+    - GradeSubmissionInputDTO
+  Puertos:
+    - SubmissionRepository
+    - FileStoragePort
+    - AssignmentLookupPort
+    - AuditLogger
+  Registros:
+    - SubmissionRecord
+    - FileRecord
+  Implementacion auxiliar:
+    - NoOpAuditLogger
+
+Modulo src/app/report:
+  Servicio:
+    - ReportService
+  Metodos principales:
+    - GenerateReport
+    - ListAllReports
+    - GetReport
+    - GetLatestReport
+    - GetReportsByStudentAndCourse
+  DTOs:
+    - GenerateReportInputDTO
+    - ReportOutputDTO
+  Puertos:
+    - ReportRepository
+    - AssignmentQueryPort
+    - SubmissionQueryPort
+  Registro:
+    - ReportRecord
+
+Relaciones:
+  - Servicios de aplicacion llaman a entidades/value objects del dominio para validar reglas.
+  - Servicios de aplicacion usan puertos, no implementaciones concretas.
+  - Infraestructura implementa los puertos definidos por aplicacion.
+  - SubmissionService usa AssignmentLookupPort para obtener el CourseId de una tarea.
+  - ReportService usa AssignmentQueryPort y SubmissionQueryPort para calcular avance, promedio y riesgo.
+
+4. Capa de dominio
+
+Ubicacion:
+  src/domain
+
+Responsabilidad:
+  - Contiene entidades, value objects, constructores y errores de negocio.
+  - Valida invariantes del sistema.
+  - No depende de HTTP, infraestructura ni servicios de aplicacion.
+
+Modulo src/domain/user:
+  Entidad base:
+    - User
+  Especializaciones:
+    - Student
+    - Professor
+    - Admin
+  Value objects:
+    - Name
+    - Email
+    - Password
+    - Rol
+  Alias hacia dominio academico:
+    - AcademicProgram
+    - Semester
+    - Area
+    - Speciality
+  Constructores:
+    - NewUser
+    - NewStudent
+    - NewProfessor
+    - NewAdmin
+    - NewName
+    - NewEmail
+    - NewPassword
+    - NewRol
+
+Modulo src/domain/AcademicProgram:
+  Value objects:
+    - AcademicProgram
+    - Semester
+    - Area
+    - Speciality
+  Reglas:
+    - Programa academico debe pertenecer a una lista permitida.
+    - Semestre debe estar entre 1 y 8.
+    - Area debe pertenecer a una lista permitida.
+    - Especialidad debe pertenecer a una lista permitida.
+
+Modulo src/domain/course:
+  Entidad:
+    - Course
+  Value objects:
+    - CourseName
+    - CourseDescription
+    - AcademicPeriod
+  Comportamientos:
+    - AddStudent
+    - RemoveStudent
+    - HasStudent
+
+Modulo src/domain/assignment:
+  Entidad:
+    - Assignment
+  Value objects:
+    - AssignmentTitle
+    - AssignmentDescription
+    - PublicationDate
+    - DeliveryDate
+  Regla principal:
+    - La fecha de entrega debe ser posterior a la fecha de publicacion.
+
+Modulo src/domain/submission:
+  Entidades:
+    - Submission
+    - File
+  Value object / enum:
+    - SubmissionStatus
+  Estados:
+    - pending
+    - confirmed
+    - failed
+  Comportamientos:
+    - AddFile
+    - SetGrade
+    - SetStatus
+    - ValidateHashIntegrity
+    - IsConfirmed
+
+Modulo src/domain/report:
+  Entidad:
+    - AcademicReport
+  Value object / enum:
+    - RiskLevel
+  Estados:
+    - high
+    - medium
+    - low
+  Regla principal:
+    - DetermineRiskLevel.
+    - Avance menor a 60% genera riesgo alto.
+    - Avance entre 60% y 75% genera riesgo medio.
+    - Avance mayor a 75% genera riesgo bajo.
+
+Relaciones:
+  - Aplicacion llama a dominio.
+  - Dominio no llama a aplicacion.
+  - Dominio no conoce repositorios, HTTP ni almacenamiento.
+
+5. Capa de infraestructura
+
+Ubicacion:
+  src/infrastructure
+
+Responsabilidad:
+  - Implementa los puertos definidos por la capa de aplicacion.
+  - Contiene detalles tecnicos: memoria, archivos locales, JWT y servidor HTTP.
+
+Repositorios en memoria:
+  - src/infrastructure/user/repository.go
+    - InMemoryUserRepository.
+    - Implementa app/user.UserRepository.
+    - Guarda usuarios en map[uuid.UUID]*UserRecord.
+    - Mantiene indice por email.
+  - src/infrastructure/course/repository.go
+    - InMemoryCourseRepository.
+    - Implementa app/course.CourseRepository.
+    - Guarda cursos y alumnos inscritos.
+  - src/infrastructure/assignment/repository.go
+    - InMemoryAssignmentRepository.
+    - Implementa app/assignment.AssignmentRepository.
+    - Tambien cumple app/report.AssignmentQueryPort.
+  - src/infrastructure/submission/repository.go
+    - InMemorySubmissionRepository.
+    - Implementa app/submission.SubmissionRepository.
+    - Tambien cumple app/report.SubmissionQueryPort.
+    - Guarda submissions y archivos asociados.
+  - src/infrastructure/report/repository.go
+    - InMemoryReportRepository.
+    - Implementa app/report.ReportRepository.
+    - Permite buscar reportes por estudiante, curso y ultimo reporte.
+
+Autenticacion:
+  - src/infrastructure/common/auth/jwt_session.go
+    - JWTSessionStore.
+    - Implementa app/user.SessionStore.
+    - Genera y valida JWT con HS256.
+    - Expiracion actual: 24 horas.
+  - src/infrastructure/common/auth/session.go
+    - SessionStore.
+    - Implementacion alternativa en memoria con tokens UUID.
+
+Almacenamiento:
+  - src/infrastructure/common/storage/file_storage.go
+    - LocalFileStorage.
+    - Implementa app/submission.FileStoragePort.
+    - Guarda archivos en uploads/{assignmentId}/{studentId}/{filename}.
+    - Calcula hash SHA-256 del contenido.
+    - Lee archivos para descarga.
+
+Servidor comun:
+  - src/infrastructure/common/server.go
+    - Server.
+    - Envoltorio simple sobre http.ServeMux.
+    - Actualmente no es el servidor principal usado por cmd/main.go, porque el router activo usa Echo.
+
+Relaciones:
+  - Infraestructura implementa interfaces de aplicacion.
+  - Infraestructura de autenticacion es usada por middleware y UserService.
+  - Infraestructura de almacenamiento es usada por SubmissionService.
+  - Repositorios son usados por servicios de aplicacion.
+
+6. Documentacion OpenAPI
+
+Ubicacion:
+  docs
+
+Responsabilidad:
+  - Contiene documentacion Swagger generada.
+  - Expone el contrato HTTP de la API.
+
+Modulos principales:
+  - docs/docs.go
+  - docs/swagger.json
+  - docs/swagger.yaml
+
+Relaciones:
+  - cmd/main.go importa docs indirectamente mediante router.go.
+  - router.go sirve Swagger UI usando echo-swagger.
+  - Los handlers contienen anotaciones godoc que generan estos archivos.
+
+Flechas de comunicacion entre capas
+-----------------------------------
+
+Dibujar estas flechas con sus etiquetas:
+
+1. Cliente HTTP -> Router Echo
+   Etiqueta: envia request HTTP
+
+2. Router Echo -> Middleware JWT
+   Etiqueta: aplica autenticacion
+
+3. Middleware JWT -> JWTSessionStore
+   Etiqueta: valida token
+
+4. Router Echo -> Handler correspondiente
+   Etiqueta: despacha ruta
+
+5. Handler -> Servicio de aplicacion
+   Etiqueta: llama caso de uso
+
+6. Servicio de aplicacion -> Dominio
+   Etiqueta: crea/valida entidades y value objects
+
+7. Servicio de aplicacion -> Puerto de repositorio
+   Etiqueta: depende de interfaz
+
+8. Repositorio en memoria -> Puerto de repositorio
+   Etiqueta: implementa
+
+9. Servicio de aplicacion -> Repositorio en memoria
+   Etiqueta: usa implementacion inyectada
+
+10. SubmissionService -> FileStoragePort
+    Etiqueta: guarda/lee archivos
+
+11. LocalFileStorage -> uploads/
+    Etiqueta: escribe/lee archivo fisico
+
+12. UserService -> SessionStore
+    Etiqueta: crea sesion
+
+13. JWTSessionStore -> SessionStore
+    Etiqueta: implementa
+
+14. ReportService -> AssignmentQueryPort
+    Etiqueta: consulta tareas del curso
+
+15. ReportService -> SubmissionQueryPort
+    Etiqueta: consulta entregas del estudiante
+
+16. InMemoryAssignmentRepository -> AssignmentQueryPort
+    Etiqueta: implementa
+
+17. InMemorySubmissionRepository -> SubmissionQueryPort
+    Etiqueta: implementa
+
+18. cmd/main.go -> Infraestructura
+    Etiqueta: construye adaptadores
+
+19. cmd/main.go -> Servicios de aplicacion
+    Etiqueta: inyecta dependencias
+
+20. cmd/main.go -> Router Echo
+    Etiqueta: registra API
+
+Flujos principales para representar
+-----------------------------------
+
+Flujo de autenticacion:
+  1. Cliente llama POST /api/auth/login.
+  2. UserHandler.Login recibe email y password.
+  3. UserService.Login busca usuario por email usando UserRepository.
+  4. InMemoryUserRepository devuelve UserRecord.
+  5. UserService compara password.
+  6. JWTSessionStore genera token JWT.
+  7. Handler responde LoginOutputDTO.
+
+  Flechas:
+    - Cliente -> UserHandler: envia credenciales.
+    - UserHandler -> UserService: llama Login.
+    - UserService -> UserRepository: busca por email.
+    - UserService -> SessionStore: crea token.
+    - JWTSessionStore -> UserService: retorna JWT.
+
+Flujo de creacion de curso:
+  1. Cliente autenticado llama POST /api/courses.
+  2. JWTAuth obtiene el userId.
+  3. CourseHandler.CreateCourse toma el profesor desde el JWT.
+  4. CourseService.CreateCourse crea entidad Course.
+  5. Dominio valida nombre, descripcion y periodo.
+  6. CourseRepository.Save persiste el curso en memoria.
+  7. Handler responde CourseOutputDTO.
+
+  Flechas:
+    - Handler -> CourseService: llama CreateCourse.
+    - CourseService -> dominio course: crea Course.
+    - CourseService -> CourseRepository: guarda curso.
+    - InMemoryCourseRepository -> CourseRepository: implementa.
+
+Flujo de entrega de tarea:
+  1. Cliente autenticado llama POST /api/assignments/{assignmentId}/submissions.
+  2. SubmissionHandler.SubmitFiles lee multipart form.
+  3. Handler transforma archivos a FileUploadDTO.
+  4. SubmissionService.SubmitFiles valida tamano y MIME type.
+  5. SubmissionService consulta assignment para obtener CourseId.
+  6. LocalFileStorage guarda cada archivo en uploads/.
+  7. Dominio crea File y Submission.
+  8. SubmissionService calcula hash compuesto.
+  9. SubmissionRepository.Save guarda submission.
+  10. SubmissionRepository.AddFile guarda metadata de archivos.
+  11. Servicio confirma la entrega y genera token de confirmacion.
+  12. Handler responde SubmissionOutputDTO.
+
+  Flechas:
+    - SubmissionHandler -> SubmissionService: llama SubmitFiles.
+    - SubmissionService -> AssignmentLookupPort: consulta tarea.
+    - SubmissionService -> FileStoragePort: almacena archivo.
+    - LocalFileStorage -> uploads/: escribe archivo.
+    - SubmissionService -> dominio submission: crea Submission y File.
+    - SubmissionService -> SubmissionRepository: guarda submission y archivos.
+
+Flujo de calificacion:
+  1. Cliente autenticado llama PUT /api/submissions/{id}/grade.
+  2. SubmissionHandler.GradeSubmission recibe calificacion.
+  3. SubmissionService.GradeSubmission valida rango 0-100.
+  4. SubmissionRepository.FindById confirma que existe.
+  5. SubmissionRepository.UpdateGrade actualiza la calificacion.
+
+  Flechas:
+    - SubmissionHandler -> SubmissionService: llama GradeSubmission.
+    - SubmissionService -> SubmissionRepository: consulta y actualiza calificacion.
+
+Flujo de generacion de reporte:
+  1. Cliente autenticado llama POST /api/courses/{courseId}/reports.
+  2. ReportHandler.GenerateReport usa userId del JWT como estudiante.
+  3. ReportService.GenerateReport consulta tareas del curso.
+  4. ReportService consulta entregas del estudiante en ese curso.
+  5. Calcula porcentaje de avance.
+  6. Calcula promedio de entregas calificadas.
+  7. Busca el reporte anterior mas reciente.
+  8. Dominio crea AcademicReport y calcula riesgo.
+  9. ReportRepository.Save guarda el reporte.
+  10. Handler responde ReportOutputDTO.
+
+  Flechas:
+    - ReportHandler -> ReportService: llama GenerateReport.
+    - ReportService -> AssignmentQueryPort: obtiene total de tareas.
+    - ReportService -> SubmissionQueryPort: obtiene entregas confirmadas.
+    - ReportService -> dominio report: calcula riesgo academico.
+    - ReportService -> ReportRepository: guarda reporte.
+
+Diagrama textual sugerido
+-------------------------
+
+[Cliente HTTP]
+      |
+      | envia request HTTP
+      v
+[Capa Web / HTTP - Azul]
+  Router Echo
+  Middleware JWT
+  UserHandler
+  CourseHandler
+  AssignmentHandler
+  SubmissionHandler
+  ReportHandler
+      |
+      | llama caso de uso
+      v
+[Capa de Aplicacion - Verde]
+  UserService
+  CourseService
+  AssignmentService
+  SubmissionService
+  ReportService
+  DTOs
+  Ports / Interfaces
+      |
+      | crea/valida entidades
+      v
+[Capa de Dominio - Amarillo]
+  User, Student, Professor, Admin
+  Course
+  Assignment
+  Submission, File
+  AcademicReport
+  Value Objects y errores
+      ^
+      |
+      | implementa puertos / provee persistencia y servicios tecnicos
+      |
+[Capa de Infraestructura - Morado]
+  InMemoryUserRepository
+  InMemoryCourseRepository
+  InMemoryAssignmentRepository
+  InMemorySubmissionRepository
+  InMemoryReportRepository
+  JWTSessionStore
+  LocalFileStorage
+      |
+      | escribe/lee archivo fisico
+      v
+[uploads/ - Rojo]
+
+[cmd/main.go - Gris]
+      |
+      | construye adaptadores e inyecta dependencias
+      v
+[Web + Aplicacion + Infraestructura]
+
+Observaciones importantes para el diagrama
+------------------------------------------
+
+  - La dependencia principal va de fuera hacia dentro: HTTP -> Aplicacion -> Dominio.
+  - El dominio no depende de infraestructura.
+  - La aplicacion define interfaces, y la infraestructura las implementa.
+  - cmd/main.go puede dibujarse aparte como el componente que conecta todo.
+  - docs/ puede representarse como componente auxiliar conectado al Router Echo con la etiqueta sirve documentacion Swagger.
+  - uploads/ debe representarse como almacenamiento fisico temporal usado solo por LocalFileStorage.
+  - Aunque existen rutas etiquetadas como admin, en la arquitectura actual la proteccion visible es autenticacion JWT; no hay una capa clara de autorizacion por rol en el middleware.

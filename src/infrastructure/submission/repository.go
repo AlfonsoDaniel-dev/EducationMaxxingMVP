@@ -119,6 +119,34 @@ func (r *InMemorySubmissionRepository) AddFile(submissionId uuid.UUID, file *app
 	return nil
 }
 
+func (r *InMemorySubmissionRepository) FindByAssignmentId(assignmentId uuid.UUID) ([]*appsubmission.SubmissionRecord, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var results []*appsubmission.SubmissionRecord
+	for _, record := range r.data {
+		if record.AssignmentId == assignmentId {
+			results = append(results, copyRecord(record))
+		}
+	}
+	return results, nil
+}
+
+func (r *InMemorySubmissionRepository) FindFileById(fileId uuid.UUID) (*appsubmission.FileRecord, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, files := range r.files {
+		for _, f := range files {
+			if f.Id == fileId {
+				copy := *f
+				return &copy, nil
+			}
+		}
+	}
+	return nil, ErrSubmissionNotFound
+}
+
 func (r *InMemorySubmissionRepository) FindFilesBySubmission(submissionId uuid.UUID) ([]*appsubmission.FileRecord, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()

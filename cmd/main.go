@@ -17,9 +17,9 @@ import (
 	appreport "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/app/report"
 	appsubmission "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/app/submission"
 	appuser "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/app/user"
+	infraassignment "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/assignment"
 	"github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/common/auth"
 	"github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/common/storage"
-	infraassignment "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/assignment"
 	infracourse "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/course"
 	infrareport "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/report"
 	infrasubmission "github.com/AlfonsoDaniel-dev/EducationMaxxing/src/infrastructure/submission"
@@ -34,21 +34,21 @@ func main() {
 	}
 
 	// Infrastructure
-	sessionStore   := auth.NewJWTSessionStore(jwtSecret)
-	fileStorage    := storage.NewLocalFileStorage("./uploads")
-	userRepo       := infrauser.NewInMemoryUserRepository()
-	courseRepo     := infracourse.NewInMemoryCourseRepository()
+	sessionStore := auth.NewJWTSessionStore(jwtSecret)
+	fileStorage := storage.NewLocalFileStorage("./uploads")
+	userRepo := infrauser.NewInMemoryUserRepository()
+	courseRepo := infracourse.NewInMemoryCourseRepository()
 	assignmentRepo := infraassignment.NewInMemoryAssignmentRepository()
 	submissionRepo := infrasubmission.NewInMemorySubmissionRepository()
-	reportRepo     := infrareport.NewInMemoryReportRepository()
-	auditLogger    := &appsubmission.NoOpAuditLogger{}
+	reportRepo := infrareport.NewInMemoryReportRepository()
+	auditLogger := &appsubmission.NoOpAuditLogger{}
 
 	// App services
-	userSvc       := appuser.NewUserService(userRepo, sessionStore)
-	courseSvc     := appcourse.NewCourseService(courseRepo)
+	userSvc := appuser.NewUserService(userRepo, sessionStore)
+	courseSvc := appcourse.NewCourseService(courseRepo)
 	assignmentSvc := appassignment.NewAssignmentService(assignmentRepo)
 	submissionSvc := appsubmission.NewSubmissionService(submissionRepo, fileStorage, auditLogger, assignmentRepo)
-	reportSvc     := appreport.NewReportService(reportRepo, assignmentRepo, submissionRepo)
+	reportSvc := appreport.NewReportService(reportRepo, assignmentRepo, submissionRepo)
 
 	// Seed default admin
 	_, _ = userSvc.CreateUser(appuser.CreateUserInputDTO{

@@ -135,6 +135,46 @@ func (h *SubmissionHandler) GradeSubmission(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "submission graded"})
 }
 
+// ListByAssignment godoc
+// @Summary      List all submissions for an assignment
+// @Description  Professor view: returns all student submissions for the given assignment
+// @Tags         submissions
+// @Security     BearerAuth
+// @Produce      json
+// @Param        assignmentId path string true "Assignment ID"
+// @Success      200 {array}  appsubmission.SubmissionOutputDTO
+// @Failure      401 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Router       /assignments/{assignmentId}/submissions [get]
+func (h *SubmissionHandler) ListByAssignment(c echo.Context) error {
+	output, err := h.svc.ListByAssignment(c.Param("assignmentId"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponse{err.Error()})
+	}
+	return c.JSON(http.StatusOK, output)
+}
+
+// ServeFile godoc
+// @Summary      Download a submitted file
+// @Description  Returns raw file content with appropriate Content-Type for download
+// @Tags         submissions
+// @Security     BearerAuth
+// @Produce      application/octet-stream
+// @Param        fileId path string true "File ID"
+// @Success      200
+// @Failure      401 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Router       /files/{fileId} [get]
+func (h *SubmissionHandler) ServeFile(c echo.Context) error {
+	content, mimeType, fileName, err := h.svc.ServeFile(c.Param("fileId"))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, ErrorResponse{err.Error()})
+	}
+
+	c.Response().Header().Set("Content-Disposition", `attachment; filename="`+fileName+`"`)
+	return c.Blob(http.StatusOK, mimeType, content)
+}
+
 // GetMySubmissions godoc
 // @Summary      Get my submissions for a course
 // @Tags         submissions
