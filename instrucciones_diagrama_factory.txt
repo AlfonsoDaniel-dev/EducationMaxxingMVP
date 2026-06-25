@@ -1,0 +1,455 @@
+INSTRUCCIONES PARA GENERAR EL DIAGRAMA UML DEL PATRÓN FACTORY
+=============================================================
+
+[Formato sugerido: Documento de instrucciones para IA generadora de imágenes]
+Este documento describe con detalle cómo generar una imagen tipo draw.io para el diagrama UML del patrón Factory / Fábrica Simple aplicado al sistema EducationMaxxingMVP. La estética debe imitar el estilo visual del diagrama de arquitectura usado como referencia: fondo negro, cajas con bordes blancos, texto blanco, líneas rectas, flechas claras, separación por secciones y leyenda visual.
+
+
+OBJETIVO DE LA IMAGEN
+=====================
+
+[Formato sugerido: Párrafo]
+Crear un diagrama UML de clases que muestre cómo UserService.CreateUser funciona como una Fábrica Simple para crear usuarios concretos del dominio: Student, Professor y Admin. El diagrama debe verse como si hubiera sido creado manualmente en draw.io, con una estética técnica, ordenada, monocromática y de alto contraste. Debe representar clases reales del sistema, atributos, métodos, relaciones y una pequeña leyenda de líneas.
+
+
+ESTILO VISUAL GENERAL
+=====================
+
+[Formato sugerido: Lista de viñetas]
+- Usar fondo negro o gris muy oscuro, casi negro.
+- Usar texto blanco.
+- Usar cajas rectangulares con borde blanco fino.
+- Usar esquinas ligeramente redondeadas, pero no demasiado redondeadas.
+- Usar líneas blancas para relaciones.
+- Usar flechas sólidas para llamadas directas o creación.
+- Usar flechas punteadas para dependencia o implementación de interfaz.
+- Usar flechas de generalización UML con triángulo hueco para herencia/composición hacia User.
+- Mantener estilo limpio, técnico y similar a un diagrama de draw.io.
+- No usar colores brillantes ni degradados.
+- No usar ilustraciones decorativas.
+- No usar iconos innecesarios.
+- Mantener alineación estricta en columnas y filas.
+- La imagen debe tener aspecto de diagrama académico de ingeniería de software.
+
+
+FORMATO DE LIENZO
+=================
+
+[Formato sugerido: Lista de especificaciones]
+- Relación de aspecto recomendada: 16:9 horizontal.
+- Resolución sugerida: 1400 x 900 px o similar.
+- Margen exterior: 30 px.
+- Fondo: #111111.
+- Bordes: blanco #FFFFFF, grosor 1.2 px.
+- Texto: blanco #FFFFFF.
+- Fuente: sans-serif técnica similar a Arial, Helvetica o Roboto.
+- Tamaño de texto para títulos: 17 a 20 px.
+- Tamaño de texto para nombres de clases: 15 a 17 px.
+- Tamaño de texto para atributos y métodos: 12 a 14 px.
+- Alinear texto dentro de las cajas a la izquierda, excepto títulos generales y encabezados de sección, que deben ir centrados.
+
+
+DISTRIBUCIÓN GENERAL DEL DIAGRAMA
+=================================
+
+[Formato sugerido: Instrucciones de composición]
+Dividir el diagrama en tres zonas horizontales principales y una zona lateral de leyenda.
+
+Zona 1: Título superior
+-----------------------
+- En la parte superior central colocar el título:
+  "Factory / Fábrica Simple - Creación de usuarios"
+- Debajo del título, en texto más pequeño, colocar:
+  "EducationMaxxingMVP - src/app/user y src/domain/user"
+- El título debe estar dentro de una caja delgada o directamente sobre el fondo, pero centrado.
+
+Zona 2: Fábrica y entrada
+-------------------------
+- En la parte superior izquierda colocar la clase CreateUserInputDTO.
+- En la parte superior central colocar la clase UserService con una etiqueta visible:
+  "<<Factory>>"
+- UserService debe ser visualmente la caja más importante de esta zona.
+- Dibujar una flecha sólida desde CreateUserInputDTO hacia UserService.
+- Etiqueta de la flecha:
+  "recibe input"
+
+Zona 3: Productos de dominio
+----------------------------
+- En el centro del diagrama colocar la clase User como producto base.
+- Debajo de User, colocar tres cajas en fila:
+  Student, Professor y Admin.
+- Student debe estar abajo a la izquierda.
+- Professor debe estar abajo al centro.
+- Admin debe estar abajo a la derecha.
+- Dibujar relaciones UML desde Student, Professor y Admin hacia User.
+- Las flechas deben apuntar hacia User.
+- Etiqueta general cerca de estas flechas:
+  "hereda / embebe User"
+
+Zona 4: Persistencia e interfaz
+-------------------------------
+- A la derecha de UserService colocar la interfaz UserRepository.
+- Debajo o a la derecha de UserRepository colocar la clase UserRecord.
+- Dibujar una flecha punteada desde UserService hacia UserRepository.
+- Etiqueta:
+  "depende de interfaz"
+- Dibujar una flecha sólida desde UserService hacia UserRecord.
+- Etiqueta:
+  "crea registro persistible"
+- Dibujar una flecha punteada desde UserRecord hacia UserRepository o una flecha sólida desde UserService hacia UserRepository con etiqueta:
+  "Save(record)"
+
+Zona 5: Leyenda
+---------------
+- En la parte inferior derecha colocar una caja titulada:
+  "Leyenda de líneas"
+- Dentro de la leyenda incluir tres ejemplos:
+  1. Línea sólida con flecha: "crea / llama"
+  2. Línea punteada con flecha: "depende de"
+  3. Línea con triángulo hueco UML: "hereda / embebe"
+
+
+CLASES UML QUE DEBEN APARECER
+=============================
+
+[Formato sugerido: Lista detallada de cajas UML]
+Cada clase debe estar dibujada como una caja UML con tres compartimentos:
+1. Nombre de la clase.
+2. Atributos.
+3. Métodos.
+
+
+CAJA 1: CreateUserInputDTO
+==========================
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+CreateUserInputDTO
+
+Atributos:
++Name: string
++Email: string
++Password: string
++Rol: string
++EnrollmentId: string
++AcademicProgram: string
++Semester: int
++Speciality: string
++Department: string
++Area: string
+
+Métodos:
+(sin métodos)
+
+[Formato visual]
+- Ubicar esta caja arriba a la izquierda.
+- Tamaño aproximado: 250 px ancho x 250 px alto.
+- Debe conectarse a UserService con flecha sólida.
+
+
+CAJA 2: UserService
+===================
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+<<Factory>>
+UserService
+
+Atributos:
+-repo: UserRepository
+-sessionStore: SessionStore
+
+Métodos:
++CreateUser(input: CreateUserInputDTO): UserOutputDTO
++Login(input: LoginInputDTO): LoginOutputDTO
++ListUsers(role: string): UserOutputDTO[]
+
+[Formato visual]
+- Ubicar esta caja en la parte superior central.
+- Tamaño aproximado: 340 px ancho x 210 px alto.
+- Resaltar esta caja con borde blanco ligeramente más grueso que las demás.
+- Esta caja representa la fábrica simple.
+- Desde esta caja deben salir flechas hacia Student, Professor, Admin, UserRecord y UserRepository.
+
+
+CAJA 3: User
+============
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+User
+
+Atributos:
++Id: UUID
++Name: *Name
++Email: *Email
++Password: *Password
++Rol: *Rol
+
+Métodos:
++GetId(): UUID
++GetName(): string
++GetEmail(): string
++GetPassword(): string
++GetRol(): string
+
+[Formato visual]
+- Ubicar esta caja en el centro del diagrama, debajo de UserService.
+- Tamaño aproximado: 300 px ancho x 230 px alto.
+- Debe recibir flechas de generalización desde Student, Professor y Admin.
+
+
+CAJA 4: Student
+===============
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+Student
+
+Atributos:
++EnrollmentId: string
++AcademicProgram: *AcademicProgram
++Semester: *Semester
+
+Métodos:
++NewStudent(...): Student
++GetEnrollmentId(): string
++GetAcademicProgram(): string
++GetSemester(): int
+
+[Formato visual]
+- Ubicar abajo a la izquierda, debajo de User.
+- Tamaño aproximado: 300 px ancho x 190 px alto.
+- Conectar hacia User con flecha UML de generalización o composición.
+- Desde UserService dibujar flecha sólida hacia Student con etiqueta:
+  "si Rol = student"
+
+
+CAJA 5: Professor
+=================
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+Professor
+
+Atributos:
++Speciality: *Speciality
++Department: *Area
+
+Métodos:
++NewProfessor(...): Professor
++GetSpeciality(): string
++GetDepartment(): string
+
+[Formato visual]
+- Ubicar abajo al centro, debajo de User.
+- Tamaño aproximado: 300 px ancho x 170 px alto.
+- Conectar hacia User con flecha UML de generalización o composición.
+- Desde UserService dibujar flecha sólida hacia Professor con etiqueta:
+  "si Rol = professor"
+
+
+CAJA 6: Admin
+=============
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+Admin
+
+Atributos:
++Area: *Area
+
+Métodos:
++NewAdmin(...): Admin
++GetArea(): string
+
+[Formato visual]
+- Ubicar abajo a la derecha, debajo de User.
+- Tamaño aproximado: 260 px ancho x 150 px alto.
+- Conectar hacia User con flecha UML de generalización o composición.
+- Desde UserService dibujar flecha sólida hacia Admin con etiqueta:
+  "si Rol = admin"
+
+
+CAJA 7: UserRecord
+==================
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+UserRecord
+
+Atributos:
++Id: UUID
++Name: string
++Email: string
++Password: string
++Rol: string
+
+Métodos:
+(sin métodos)
+
+[Formato visual]
+- Ubicar a la derecha o debajo de UserRepository.
+- Tamaño aproximado: 260 px ancho x 170 px alto.
+- Conectar desde UserService con flecha sólida.
+- Etiqueta de la flecha:
+  "convierte dominio a record"
+
+
+CAJA 8: UserRepository
+======================
+
+[Formato sugerido: Contenido textual exacto de la caja]
+Nombre:
+<<interface>>
+UserRepository
+
+Atributos:
+(sin atributos)
+
+Métodos:
++Save(user: UserRecord): error
++FindById(id: UUID): UserRecord
++FindByEmail(email: string): UserRecord
++FindAll(): UserRecord[]
++FindByRole(role: string): UserRecord[]
+
+[Formato visual]
+- Ubicar en la parte superior derecha.
+- Tamaño aproximado: 330 px ancho x 230 px alto.
+- Debe verse claramente como interfaz UML.
+- Conectar desde UserService con línea punteada y flecha.
+- Etiqueta:
+  "depende de interfaz"
+
+
+RELACIONES Y FLECHAS EXACTAS
+============================
+
+[Formato sugerido: Lista numerada]
+1. CreateUserInputDTO -> UserService
+   - Tipo de línea: sólida.
+   - Flecha: normal.
+   - Etiqueta: "recibe input".
+
+2. UserService -> Student
+   - Tipo de línea: sólida.
+   - Flecha: normal.
+   - Etiqueta: "si Rol = student".
+
+3. UserService -> Professor
+   - Tipo de línea: sólida.
+   - Flecha: normal.
+   - Etiqueta: "si Rol = professor".
+
+4. UserService -> Admin
+   - Tipo de línea: sólida.
+   - Flecha: normal.
+   - Etiqueta: "si Rol = admin".
+
+5. Student -> User
+   - Tipo de línea: sólida.
+   - Flecha: triángulo hueco UML apuntando a User.
+   - Etiqueta: "embebe User".
+
+6. Professor -> User
+   - Tipo de línea: sólida.
+   - Flecha: triángulo hueco UML apuntando a User.
+   - Etiqueta: "embebe User".
+
+7. Admin -> User
+   - Tipo de línea: sólida.
+   - Flecha: triángulo hueco UML apuntando a User.
+   - Etiqueta: "embebe User".
+
+8. UserService -> UserRecord
+   - Tipo de línea: sólida.
+   - Flecha: normal.
+   - Etiqueta: "crea UserRecord".
+
+9. UserService -> UserRepository
+   - Tipo de línea: punteada.
+   - Flecha: normal.
+   - Etiqueta: "depende de interfaz".
+
+10. UserService -> UserRepository
+    - Tipo de línea: sólida.
+    - Flecha: normal.
+    - Etiqueta: "Save(record)".
+    - Esta flecha puede combinarse visualmente con la anterior si el espacio es limitado, pero la etiqueta Save(record) debe aparecer.
+
+
+ORGANIZACIÓN ESPACIAL RECOMENDADA
+=================================
+
+[Formato sugerido: Descripción por coordenadas aproximadas]
+Usar una organización parecida a esta:
+
+- Título en la parte superior central.
+- CreateUserInputDTO en columna izquierda superior.
+- UserService al centro superior.
+- UserRepository en columna derecha superior.
+- User en el centro medio.
+- UserRecord a la derecha media, debajo de UserRepository.
+- Student, Professor y Admin en una fila inferior.
+- Leyenda en la esquina inferior derecha.
+
+[Formato sugerido: Diagrama textual de referencia]
+
+                 [Título: Factory / Fábrica Simple - Creación de usuarios]
+
+ [CreateUserInputDTO] ---> [<<Factory>> UserService] - - - -> [<<interface>> UserRepository]
+                                  |       |       |                  ^
+                                  |       |       |                  |
+                                  |       |       +-----> [UserRecord]
+                                  |       |
+                                  v       v
+                              [Student] [Professor] [Admin]
+                                   \       |       /
+                                    \      |      /
+                                     \     |     /
+                                      v    v    v
+                                      [User]
+
+                                                [Leyenda de líneas]
+
+Nota: En la imagen final puede invertirse la posición de User y los productos concretos para lograr una lectura UML más tradicional, siempre que las flechas de herencia apunten hacia User.
+
+
+TEXTOS IMPORTANTES QUE DEBEN SER LEGIBLES
+=========================================
+
+[Formato sugerido: Lista]
+- "Factory / Fábrica Simple - Creación de usuarios"
+- "<<Factory>> UserService"
+- "<<interface>> UserRepository"
+- "si Rol = student"
+- "si Rol = professor"
+- "si Rol = admin"
+- "crea UserRecord"
+- "depende de interfaz"
+- "Save(record)"
+- "Leyenda de líneas"
+
+
+RESTRICCIONES IMPORTANTES
+=========================
+
+[Formato sugerido: Lista de viñetas]
+- No usar clases genéricas como Creator, Product, ConcreteProduct o FactoryProduct.
+- Usar únicamente nombres reales del sistema.
+- No representar Singleton en este diagrama.
+- No agregar base de datos, HTTP handlers ni capas completas de arquitectura; este diagrama es solo del patrón Factory.
+- No usar colores de relleno fuertes.
+- No usar sombras pesadas.
+- No usar dibujos decorativos.
+- No saturar el diagrama con demasiado texto pequeño.
+- Mantener el aspecto similar a draw.io, no a una infografía publicitaria.
+- La imagen debe parecer un diagrama técnico formal para entregar en clase.
+
+
+PROMPT FINAL PARA GPTIMAGE
+==========================
+
+[Formato sugerido: Prompt listo para copiar]
+Genera un diagrama UML de clases estilo draw.io, horizontal 16:9, fondo negro #111111, cajas rectangulares con bordes blancos y texto blanco. El diagrama debe mostrar el patrón Factory / Fábrica Simple en el backend EducationMaxxingMVP. Título superior: "Factory / Fábrica Simple - Creación de usuarios". Usar cajas UML con tres compartimentos: nombre, atributos y métodos. En el centro superior colocar "<<Factory>> UserService" con atributos "-repo: UserRepository", "-sessionStore: SessionStore" y métodos "+CreateUser(input: CreateUserInputDTO): UserOutputDTO", "+Login(input: LoginInputDTO): LoginOutputDTO", "+ListUsers(role: string): UserOutputDTO[]". A la izquierda colocar "CreateUserInputDTO" con atributos "+Name: string", "+Email: string", "+Password: string", "+Rol: string", "+EnrollmentId: string", "+AcademicProgram: string", "+Semester: int", "+Speciality: string", "+Department: string", "+Area: string". A la derecha colocar "<<interface>> UserRepository" con métodos "+Save(user: UserRecord): error", "+FindById(id: UUID): UserRecord", "+FindByEmail(email: string): UserRecord", "+FindAll(): UserRecord[]", "+FindByRole(role: string): UserRecord[]". Debajo de UserService colocar la clase "User" con atributos "+Id: UUID", "+Name: *Name", "+Email: *Email", "+Password: *Password", "+Rol: *Rol" y métodos "+GetId(): UUID", "+GetName(): string", "+GetEmail(): string", "+GetPassword(): string", "+GetRol(): string". En la fila inferior colocar "Student", "Professor" y "Admin". Student debe tener "+EnrollmentId: string", "+AcademicProgram: *AcademicProgram", "+Semester: *Semester", métodos "+NewStudent(...): Student", "+GetEnrollmentId(): string", "+GetAcademicProgram(): string", "+GetSemester(): int". Professor debe tener "+Speciality: *Speciality", "+Department: *Area", métodos "+NewProfessor(...): Professor", "+GetSpeciality(): string", "+GetDepartment(): string". Admin debe tener "+Area: *Area", métodos "+NewAdmin(...): Admin", "+GetArea(): string". A la derecha media colocar "UserRecord" con atributos "+Id: UUID", "+Name: string", "+Email: string", "+Password: string", "+Rol: string". Dibujar flecha sólida de CreateUserInputDTO a UserService con etiqueta "recibe input". Dibujar flechas sólidas de UserService a Student, Professor y Admin con etiquetas "si Rol = student", "si Rol = professor", "si Rol = admin". Dibujar flechas UML con triángulo hueco desde Student, Professor y Admin hacia User con etiqueta "embebe User". Dibujar flecha sólida de UserService a UserRecord con etiqueta "crea UserRecord". Dibujar flecha punteada de UserService a UserRepository con etiqueta "depende de interfaz" y flecha sólida o etiqueta adicional "Save(record)". Agregar una leyenda en la esquina inferior derecha titulada "Leyenda de líneas" con tres ejemplos: línea sólida = "crea / llama", línea punteada = "depende de", triángulo hueco = "hereda / embebe". Estética estricta de diagrama técnico, monocromático, sin decoraciones, sin gradientes, todo alineado y legible.

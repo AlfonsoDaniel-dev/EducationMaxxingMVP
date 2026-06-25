@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/lib/api'
@@ -148,13 +148,13 @@ export default function CourseDetailPage() {
   const [assignments, setAssignments] = useState<AssignmentResponse[]>([])
   const [loading, setLoading] = useState(true)
 
-  function loadData() {
+  const loadData = useCallback(() => {
     Promise.all([api.courses.get(id), api.assignments.listByCourse(id)])
       .then(([c, a]) => { setCourse(c); setAssignments(a) })
       .finally(() => setLoading(false))
-  }
+  }, [id])
 
-  useEffect(() => { loadData() }, [id])
+  useEffect(() => { loadData() }, [loadData])
 
   if (loading) {
     return (

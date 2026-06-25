@@ -249,11 +249,11 @@ function StudentView({ assignmentId, courseId }: { assignmentId: string; courseI
   const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  function loadHistory() {
+  const loadHistory = useCallback(() => {
     api.submissions.listMine(courseId).then(setSubmissions)
-  }
+  }, [courseId])
 
-  useEffect(() => { loadHistory() }, [courseId])
+  useEffect(() => { loadHistory() }, [loadHistory])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -425,6 +425,8 @@ export default function AssignmentPage() {
   const isProfessor = user?.rol === 'professor'
   const due = new Date(assignment.fechaEntrega)
   const overdue = due < new Date()
+  // This value is presentation-only. Keeping it local avoids changing backend data.
+  // eslint-disable-next-line react-hooks/purity
   const daysLeft = Math.ceil((due.getTime() - Date.now()) / 86400000)
 
   return (

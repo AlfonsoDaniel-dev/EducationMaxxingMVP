@@ -77,7 +77,6 @@ export default function UsersPage() {
   }
 
   useEffect(() => { loadUsers() }, [])
-  useEffect(() => { setCreateMode(createParam) }, [createParam])
 
   function set(k: string, v: string) { setForm(f => ({ ...f, [k]: v })) }
 

@@ -1,0 +1,242 @@
+PATRONES DE DISEÑO CREACIONALES IDENTIFICADOS EN EL SISTEMA
+============================================================
+
+[Formato sugerido: Párrafo introductorio]
+En el backend del sistema EducationMaxxingMVP se identificó como patrón creacional principal una Fábrica Simple aplicada a la creación de usuarios. Este patrón aparece en el flujo de creación de usuarios dentro del módulo src/app/user, específicamente en UserService.CreateUser, que decide qué tipo concreto de usuario debe construirse según el rol recibido: Student, Professor o Admin. Aunque el sistema también usa múltiples funciones constructoras New*, el caso más claro para documentar como patrón creacional es la creación centralizada de usuarios por rol, porque resuelve un problema real de variación de tipos dentro del dominio.
+
+
+[Formato sugerido: Tabla]
+Tabla 1. Patrones creacionales evaluados
+
+| Patrón | ¿Se aplica en el sistema? | Componente principal | Motivo |
+| --- | --- | --- | --- |
+| Factory / Fábrica Simple | Sí | UserService.CreateUser y constructores NewStudent, NewProfessor, NewAdmin | Centraliza la creación de usuarios concretos según el rol recibido. |
+| Singleton | No se recomienda documentarlo como implementado | No hay una implementación Singleton real | Los repositorios y servicios se crean en cmd/main.go, pero no tienen atributo estático de instancia, constructor privado ni método global de acceso. |
+
+
+PATRÓN 1: FACTORY / FÁBRICA SIMPLE
+==================================
+
+[Formato sugerido: Subtítulo]
+1. Problema que resuelve en el sistema
+
+[Formato sugerido: Párrafo argumentativo, mínimo 3 oraciones]
+El patrón Fábrica Simple se aplica en el componente UserService.CreateUser, ubicado en src/app/user/service.go. Este método recibe un CreateUserInputDTO y, según el valor del campo Rol, decide si debe crear un Student, un Professor o un Admin usando los constructores de dominio correspondientes. Si no se aplicara esta lógica centralizada, cada handler HTTP o cada parte del sistema que necesitara crear usuarios tendría que conocer directamente las reglas de construcción de cada tipo de usuario, lo que duplicaría lógica y aumentaría el acoplamiento entre la capa de presentación y el dominio.
+
+Además, cada tipo de usuario requiere datos distintos: Student necesita EnrollmentId, AcademicProgram y Semester; Professor necesita Speciality y Department; Admin necesita Area. Si esta decisión estuviera dispersa por varios lugares, sería fácil crear usuarios incompletos o saltarse validaciones importantes del dominio. Con esta fábrica, la creación de usuarios queda concentrada en un solo punto de la capa de aplicación, mientras que las reglas específicas de validación siguen dentro de los constructores del dominio.
+
+
+[Formato sugerido: Tabla]
+Tabla 2. Participantes del patrón Factory en el sistema
+
+| Rol dentro del patrón | Clase / función real del sistema | Ubicación | Responsabilidad |
+| --- | --- | --- | --- |
+| Fábrica simple | UserService.CreateUser | src/app/user/service.go | Decide qué tipo concreto de usuario crear según input.Rol. |
+| Producto base | User | src/domain/user/user.go | Representa los datos comunes de cualquier usuario: id, nombre, email, password y rol. |
+| Producto concreto | Student | src/domain/user/student.go | Representa un usuario estudiante con matrícula, programa académico y semestre. |
+| Producto concreto | Professor | src/domain/user/professor.go | Representa un usuario profesor con especialidad y departamento. |
+| Producto concreto | Admin | src/domain/user/admin.go | Representa un usuario administrador con área. |
+| Constructores concretos | NewStudent, NewProfessor, NewAdmin | src/domain/user/*.go | Construyen y validan cada tipo concreto de usuario. |
+| DTO de entrada | CreateUserInputDTO | src/app/user/dto.go | Transporta los datos necesarios para crear cualquier tipo de usuario. |
+| Salida uniforme | UserOutputDTO | src/app/user/dto.go | Devuelve una respuesta común sin exponer detalles internos del dominio. |
+
+
+[Formato sugerido: Subtítulo]
+2. Diagrama UML de clases del patrón
+
+Insertar diagrama 1.
+
+
+[Formato sugerido: Subtítulo]
+3. Implementación en código
+
+[Formato sugerido: Bloque de código monoespaciado con fondo diferenciado]
+Fragmento real del MVP, tomado de src/app/user/service.go. Este código muestra la fábrica simple dentro de UserService.CreateUser.
+
+```go
+// UserService coordina los casos de uso relacionados con usuarios.
+// En CreateUser actúa como una Fábrica Simple porque decide qué tipo
+// concreto de usuario construir según el rol recibido.
+type UserService struct {
+	repo         UserRepository
+	sessionStore SessionStore
+}
+
+func (s *UserService) CreateUser(input CreateUserInputDTO) (*UserOutputDTO, error) {
+	var record *UserRecord
+
+	// La fábrica decide qué producto concreto crear según el rol.
+	switch input.Rol {
+	case "student":
+		student, err := domainuser.NewStudent(
+			input.Name, input.Email, input.Password,
+			input.EnrollmentId, input.AcademicProgram, input.Semester,
+		)
+		if err != nil {
+			return nil, err
+		}
+		record = &UserRecord{
+			Id:       student.Id,
+			Name:     student.GetName(),
+			Email:    student.GetEmail(),
+			Password: student.GetPassword(),
+			Rol:      student.GetRol(),
+		}
+
+	case "professor":
+		professor, err := domainuser.NewProfessor(
+			input.Name, input.Email, input.Password,
+			input.Speciality, input.Department,
+		)
+		if err != nil {
+			return nil, err
+		}
+		record = &UserRecord{
+			Id:       professor.Id,
+			Name:     professor.GetName(),
+			Email:    professor.GetEmail(),
+			Password: professor.GetPassword(),
+			Rol:      professor.GetRol(),
+		}
+
+	case "admin":
+		admin, err := domainuser.NewAdmin(
+			input.Name, input.Email, input.Password, input.Area,
+		)
+		if err != nil {
+			return nil, err
+		}
+		record = &UserRecord{
+			Id:       admin.Id,
+			Name:     admin.GetName(),
+			Email:    admin.GetEmail(),
+			Password: admin.GetPassword(),
+			Rol:      admin.GetRol(),
+		}
+
+	default:
+		return nil, domainuser.ErrRolNotValid
+	}
+
+	// La fábrica entrega una salida uniforme y el servicio persiste el resultado.
+	if err := s.repo.Save(record); err != nil {
+		return nil, err
+	}
+
+	return recordToDTO(record), nil
+}
+```
+
+[Formato sugerido: Bloque de código monoespaciado con fondo diferenciado]
+Fragmentos reales de constructores concretos del dominio.
+
+```go
+// NewStudent construye un usuario de tipo estudiante y valida sus datos académicos.
+func NewStudent(name string, email string, password string, enrollmentId string, academicProgram string, semester int) (*Student, error) {
+	usr, err := NewUser(name, email, password, "student")
+	if err != nil {
+		return nil, err
+	}
+
+	program, err := NewAcademicProgram(academicProgram)
+	if err != nil {
+		return nil, err
+	}
+
+	sem, err := NewSemester(semester)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Student{
+		User:            *usr,
+		EnrollmentId:    enrollmentId,
+		AcademicProgram: program,
+		Semester:        sem,
+	}, nil
+}
+
+// NewProfessor construye un usuario de tipo profesor y valida especialidad y departamento.
+func NewProfessor(name string, email string, password string, speciality string, department string) (*Professor, error) {
+	usr, err := NewUser(name, email, password, "professor")
+	if err != nil {
+		return nil, err
+	}
+
+	spec, err := NewSpeciality(speciality)
+	if err != nil {
+		return nil, err
+	}
+
+	area, err := NewArea(department)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Professor{
+		User:       *usr,
+		Speciality: spec,
+		Department: area,
+	}, nil
+}
+
+// NewAdmin construye un usuario administrador y valida su área.
+func NewAdmin(name string, email string, password string, area string) (*Admin, error) {
+	usr, err := NewUser(name, email, password, "admin")
+	if err != nil {
+		return nil, err
+	}
+
+	adminArea, err := NewArea(area)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Admin{
+		User: *usr,
+		Area: adminArea,
+	}, nil
+}
+```
+
+
+[Formato sugerido: Subtítulo]
+4. Justificación del patrón elegido
+
+[Formato sugerido: Párrafo argumentativo, mínimo 80 palabras]
+El patrón Fábrica Simple es adecuado para este sistema porque la creación de usuarios depende de una decisión de negocio: el rol determina qué entidad concreta debe instanciarse y qué datos adicionales deben validarse. Centralizar esta decisión en UserService.CreateUser mejora la separación de responsabilidades, ya que los handlers HTTP no necesitan conocer los detalles de construcción de Student, Professor o Admin. También favorece la cohesión, porque toda la lógica de creación de usuarios queda en el módulo de usuarios, y respeta la inversión de dependencias porque el servicio trabaja con interfaces como UserRepository para persistir el resultado. Además, el dominio conserva sus propias validaciones en constructores específicos, evitando que la capa de presentación cree objetos inválidos o incompletos.
+
+
+PATRÓN CONSIDERADO PERO NO IMPLEMENTADO: SINGLETON
+==================================================
+
+[Formato sugerido: Subtítulo]
+Razón para no documentarlo como patrón implementado
+
+[Formato sugerido: Párrafo]
+El sistema crea repositorios y servicios una sola vez dentro de cmd/main.go, pero eso corresponde más a una raíz de composición que a un Singleton formal. Para que fuera Singleton, una clase o componente debería tener un atributo estático de instancia, un constructor privado y un método estático global de acceso. En el MVP actual no existe esa estructura; por lo tanto, presentarlo como Singleton implementado sería débil desde el punto de vista de modelado.
+
+[Formato sugerido: Párrafo]
+Además, en Go es común preferir inyección explícita de dependencias sobre accesos globales, porque facilita pruebas, reduce acoplamiento y mantiene clara la dirección de dependencias. Los repositorios actuales se pasan a los servicios desde cmd/main.go, lo cual conserva mejor la arquitectura por capas del proyecto. Por esa razón, para la evaluación se recomienda defender únicamente Factory / Fábrica Simple como patrón creacional principal, en lugar de forzar un Singleton superficial.
+
+
+RESUMEN PARA EL DOCUMENTO
+=========================
+
+[Formato sugerido: Tabla]
+Tabla 3. Resumen final del patrón seleccionado
+
+| Patrón seleccionado | Componente donde se aplica | Problema que resuelve | Principios relacionados |
+| --- | --- | --- | --- |
+| Factory / Fábrica Simple | UserService.CreateUser | Centraliza la creación de Student, Professor y Admin según el rol del usuario. | Separación de responsabilidades, cohesión, encapsulamiento de creación e inversión de dependencias. |
+
+[Formato sugerido: Viñetas]
+Puntos clave para explicar oralmente:
+
+- El sistema no crea todos los usuarios de la misma forma.
+- Cada rol tiene datos y validaciones diferentes.
+- UserService.CreateUser actúa como fábrica porque decide qué objeto concreto construir.
+- Los constructores del dominio mantienen las reglas de validación.
+- Los handlers HTTP no necesitan conocer la lógica interna de creación.
+- El resultado se persiste mediante UserRepository, que es una interfaz.
+- Esto mantiene separadas la presentación, la aplicación, el dominio y la infraestructura.

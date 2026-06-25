@@ -1,0 +1,76 @@
+6. Funcionamiento del MVP
+EducationMaxxingMVP - Evidencia funcional del demo
+Esta sección documenta el alcance funcional del demo, los pasos necesarios para ejecutar el sistema y las evidencias capturadas durante un recorrido completo por la interfaz web. El flujo validado cubre administración de usuarios, creación de curso, creación de asignación y entrega de tarea por parte de un alumno.
+6.1 Alcance Funcional del Demo
+El demo se limita al comportamiento central del MVP: autenticación por roles, administración básica de usuarios y cursos, creación de asignaciones y carga de archivos de entrega. Las funciones marcadas como V2 representan capacidades fuera del alcance inmediato o no demostradas dentro del recorrido principal.
+FUNCIONALIDAD
+¿INCLUIDA EN EL MVP?
+OBSERVACIÓN
+Inicio de sesión y autenticación por JWT
+Sí - incluida
+Funcional y probada con administrador, profesor y alumno durante el recorrido del demo.
+Gestión de usuarios por administrador
+Sí - incluida
+El administrador crea usuarios con rol profesor y alumno desde la interfaz web.
+Creación y asignación de cursos
+Sí - incluida
+El administrador crea un curso nuevo y lo asigna al profesor creado en el flujo.
+Inscripción de alumnos a cursos
+Sí - incluida
+El alumno creado se inscribe al curso mediante el panel de administración.
+Creación de asignaciones por profesor
+Sí - incluida
+El profesor entra a su curso y crea una asignación con fecha de inicio y cierre.
+Subida de tareas por alumno
+Sí - incluida
+El alumno adjunta un archivo válido y recibe confirmación de entrega.
+Validación de archivo inválido
+Sí - incluida
+El sistema rechaza un ejecutable y muestra el mensaje de error correspondiente.
+Revisión y calificación de entregas
+Sí - parcial
+El backend y la vista de profesor contemplan revisión; no fue el foco principal de este demo.
+Reportes académicos avanzados
+No - V2
+Quedan fuera del alcance funcional demostrado en esta sección del MVP.
+Persistencia en base de datos real
+No - V2
+El MVP usa repositorios en memoria y almacenamiento local de archivos para evidenciar el flujo.
+
+6.2 Instrucciones de Ejecución del Demo
+Requisitos previos
+Go 1.26.2 o compatible para ejecutar el backend.
+Node.js 25.9.0 y npm 11.12.1 o versiones compatibles con Next.js 16.2.7.
+Navegador moderno, preferentemente Google Chrome.
+Puerto 8080 disponible para la API y puerto 3000 disponible para el frontend.
+Archivo frontend/.env.local con NEXT_PUBLIC_API_URL=http://localhost:8080/api.
+Pasos de instalación y ejecución
+Abrir una terminal en la raíz del proyecto EducationMaxxingMVP.
+Ejecutar go mod download para descargar las dependencias del backend.
+Iniciar el backend con go run ./cmd. La API quedará disponible en http://localhost:8080.
+Abrir una segunda terminal y entrar a la carpeta frontend.
+Ejecutar npm install si las dependencias del frontend aún no están instaladas.
+Verificar que frontend/.env.local apunte a http://localhost:8080/api.
+Iniciar la interfaz con npm run dev. El proyecto está configurado para usar Webpack y evitar el fallo previo de Turbopack.
+Abrir http://localhost:3000/login en el navegador.
+Flujo básico de navegación
+Ingresar como administrador con admin@educationmaxxing.com y admin1234.
+Desde Users, crear un profesor y un alumno. Después, desde Courses, crear un curso y asignarlo al profesor.
+Regresar a Users e inscribir el alumno en el curso creado.
+Cerrar sesión e ingresar como profesor para abrir el curso y crear una asignación.
+Cerrar sesión e ingresar como alumno para abrir la asignación, probar un archivo inválido y posteriormente subir un archivo válido.
+Datos usados en la captura
+Profesor: profesor.demo.1782352993821@university.edu. Alumno: alumno.demo.1782352993821@university.edu. Curso: Arquitectura MVP 93821. Asignación: Entrega Demo 93821.
+6.3 Evidencias del Sistema en Ejecución
+Captura 1: Pantalla de inicio del administrador
+
+Evidencia: 01_inicio_dashboard_admin.png
+La captura muestra el ingreso exitoso del usuario administrador al panel principal del sistema. En esta pantalla se identifica la capa de presentación web, compuesta por el layout autenticado, el menú lateral y la vista de resumen de plataforma. Arquitectónicamente, este estado confirma que el login fue validado por el handler HTTP de autenticación, que el token JWT fue almacenado por el frontend y que la sesión permite cargar vistas protegidas.
+Captura 2: Entrega exitosa de una tarea
+
+Evidencia: 02_entrega_exitosa.png
+La captura muestra el caso de uso principal del alumno: subir un archivo válido a una asignación existente. El sistema devuelve una confirmación con identificador de entrega y registra el historial de la submission como confirmada. En la arquitectura se observa la interacción entre el handler de entregas, SubmissionService, el repositorio de submissions y el puerto FileStorage, que guarda físicamente el archivo en almacenamiento local.
+Captura 3: Manejo de error por archivo inválido
+
+Evidencia: 03_error_archivo_invalido.png
+La captura evidencia el manejo de excepciones cuando el alumno intenta subir un archivo ejecutable no permitido. La interfaz conserva el contexto de la asignación y muestra el mensaje file type is not allowed sin romper el flujo del usuario. Este comportamiento está alineado con la capa de aplicación, donde SubmissionService valida el tipo de archivo antes de persistirlo, y con la capa HTTP, que transforma el error en una respuesta controlada.

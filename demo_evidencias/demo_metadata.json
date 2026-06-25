@@ -1,0 +1,30 @@
+{
+  "professor": {
+    "name": "Profesor Demo MVP",
+    "email": "profesor.demo.1782352993821@university.edu",
+    "password": "profesor123",
+    "id": "dcbe397a-e625-4c3e-9f20-b603bead80ff"
+  },
+  "student": {
+    "name": "Alumno Demo MVP",
+    "email": "alumno.demo.1782352993821@university.edu",
+    "password": "alumno1234",
+    "enrollmentId": "ALU993821",
+    "id": "f5c149a9-5657-4633-ae95-6842b9799ea4"
+  },
+  "course": {
+    "name": "Arquitectura MVP 93821",
+    "period": "2026-2",
+    "description": "Curso creado durante el demo para validar usuarios, cursos, asignaciones y entregas.",
+    "id": "ba5caea7-083d-4ac3-a155-eab5b28efd4a"
+  },
+  "assignment": {
+    "title": "Entrega Demo 93821",
+    "description": "Subir un archivo valido para demostrar el flujo principal de entregas del MVP."
+  },
+  "screenshots": {
+    "dashboard": "/Users/alfonsocr/Documents/programacion/uni/EducationMaxxingMVP/demo_evidencias/01_inicio_dashboard_admin.png",
+    "submissionSuccess": "/Users/alfonsocr/Documents/programacion/uni/EducationMaxxingMVP/demo_evidencias/02_entrega_exitosa.png",
+    "invalidFileError": "/Users/alfonsocr/Documents/programacion/uni/EducationMaxxingMVP/demo_evidencias/03_error_archivo_invalido.png"
+  }
+}

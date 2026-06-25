@@ -1,76 +1,77 @@
 <claude-mem-context>
 # Memory Context
 
-# [EducationMaxxingMVP] recent context, 2026-06-24 4:57pm CST
+# [EducationMaxxingMVP] recent context, 2026-06-24 8:29pm CST
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (19,855t read) | 484,220t work | 96% savings
+Stats: 50 obs (19,041t read) | 311,524t work | 94% savings
 
 ### Jun 2, 2026
-S58 Redesign entire frontend UI with a user-friendly design system after fixing authentication token serialization bug (Jun 2 at 9:29 AM)
-S59 Investigate and fix login redirect issue — user reports being sent back to login page after attempting to log in (Jun 2 at 9:40 AM)
-S60 Build admin dashboard with role-based UI, user management, and academic report access for education platform (Jun 2 at 9:45 AM)
-281 9:55a 🟣 Create React UserContext for frontend user state management
-282 " 🟣 Add admin API client methods for frontend
-283 9:56a 🟣 Implement role-based dashboard layout with admin navigation
-284 9:57a 🟣 Implement role-specific dashboard pages with admin overview
-285 9:58a 🟣 Create comprehensive admin user management interface
-286 9:59a 🟣 Implement role-aware courses page with professor course creation
-287 " 🟣 Implement role-specific reports pages with admin report list
 S61 Implement professor assignment creation within courses and admin course/professor management (Jun 2 at 10:00 AM)
-288 10:07a 🔵 Assignment and course management architecture is partially implemented
-289 10:08a 🔵 Admin API lacks methods to create courses and assign professors
-290 " 🟣 Added UpdateProfessor method to CourseRepository interface
-291 " 🟣 Implemented UpdateProfessor in InMemoryCourseRepository
-292 " 🟣 Added AssignProfessor service method to CourseService
-293 10:09a ✅ Added assignProfessorRequest struct to CourseHandler
-294 " 🟣 Added AdminCreateCourse and AdminAssignProfessor HTTP handlers
-295 " ✅ Registered admin course endpoints in router
-296 " ✅ Backend code compiles successfully with new admin endpoints
-297 " ✅ Added AdminCreateCourseInput import to API client
-298 10:10a 🟣 Added admin API methods for course and professor management
-299 10:11a 🟣 Implemented professor assignment creation UI in course detail page
-300 10:12a 🟣 Implemented admin and professor course management UI in courses listing page
-301 " ✅ Frontend builds successfully with TypeScript validation
 S62 Implement admin course and professor management features; redesign landing page from simple redirect to professional marketing experience (Jun 2 at 10:12 AM)
-302 10:17a 🟣 Implemented comprehensive landing page for unauthenticated users
 S63 Refactor landing page SVG component coordinates to eliminate server/client hydration mismatch caused by floating-point precision (Jun 2 at 10:21 AM)
 S64 Refactor landing page to be publicly accessible; remove authentication checks and optimize SVG rendering for server/client hydration consistency (Jun 2 at 10:23 AM)
 S65 Commit changes and prepare a pull request for role-based platform MVP (Jun 2 at 10:26 AM)
-311 10:30a 🟣 Comprehensive user management, course assignments, and reporting system implementation
-312 " 🟣 Complete role-based platform with admin controls, assignment system, and landing page
-313 10:31a ✅ Development branch pushed to remote repository
-314 10:32a ✅ GitHub pull request created for role-based platform implementation
 S66 Create a plan for professor assignment submission review - allowing professors to check who completed assignments and access submitted files (Jun 2 at 10:33 AM)
-315 1:52p 🔵 Existing submission architecture supports file retrieval and status tracking
-316 " 🔵 Missing repository method to query submissions by assignment across all students
-317 3:25p 🟣 Extended submission repository and file storage interfaces
-318 3:26p 🟣 Implemented repository query methods for assignment submissions and file retrieval
-319 " 🟣 Implemented ReadFile method in LocalFileStorage
-320 " 🟣 Added service methods for assignment submission listing and file serving
-321 3:27p 🟣 Added HTTP handlers for assignment submission listing and file downloads
-322 " ✅ Registered new submission and file download routes in HTTP router
-323 " 🟣 Backend build successful; added frontend file download utility
-324 3:28p 🟣 Added frontend API method for listing submissions by assignment
-325 " 🟣 Implemented role-based assignment page with professor submission review interface
-326 3:29p 🟣 Complete submission management feature with professor grading interface deployed
-S67 Implement submission management system: backend APIs for listing submissions, file downloads, grading; frontend role-based UI for professors (grading interface) and students (submission form) (Jun 2 at 3:30 PM)
+S67 Implement submission management system: backend APIs for listing submissions, file downloads, grading; frontend role-based UI for professors (grading interface) and students (submission form) (Jun 2 at 1:53 PM)
+S82 Complete MVP documentation and demonstration: create .docx file with functional scope (6.1), demo instructions (6.2), and 3+ screenshots (6.3) showing admin→professor→course→student workflow plus file upload with error handling; capture evidence via browser automation. (Jun 2 at 3:30 PM)
 ### Jun 23, 2026
-462 3:48p 🔵 EducationMaxxingMVP Project Architecture and Design Patterns
-463 3:49p 🔵 EducationMaxxingMVP Tech Stack and Application Bootstrap
-464 " 🔵 User Domain Value Objects Implementation
-465 3:50p 🔵 User Aggregate and Specialization Pattern Implementation
-466 " 🔵 Complete Domain Model: Course, Assignment, Submission, Report Aggregates
-467 " 🔵 Application Layer Pattern: Domain Orchestration and Data Conversion
-468 " 🔵 Complex Workflow Services: Submission and Report Generation
-469 3:51p 🔵 Infrastructure Layer: In-Memory Repositories and Local File Storage
-470 " 🔵 HTTP Layer: Echo Router, JWT Authentication, and REST Handlers
-471 " 🔵 No Test Coverage: MVP Stage Without Unit Tests
-472 3:52p 🔵 Default Admin Credentials and Security Configuration
 473 3:59p 🔵 Backend Architecture Documentation Generated
+### Jun 24, 2026
+474 4:57p 🔵 Turbopack JSON parsing error during frontend dev build
+475 4:58p 🔵 Malformed JSON files discovered in node_modules dependencies
+476 " 🔵 Extensive malformed JSON files in npm dependency chain
+477 " 🔴 Switch frontend dev build from Turbopack to Webpack bundler
+478 " 🔵 Frontend dev server port 3001 permission denied
+479 4:59p 🔴 Frontend dev server successfully running with Webpack bundler
+480 " ✅ Configure outputFileTracingRoot in Next.js config
+481 5:00p 🔴 Workspace root detection warning resolved
+482 6:26p 🔵 Backend Project Structure: Domain-Driven Design with Layered Architecture
+483 6:27p 🔵 Complete Backend Architecture Map: In-Memory DDD with Echo, JWT Auth, and Disk Storage
+484 6:29p ✅ Backend Architecture Documentation Translated to Spanish
+485 6:57p ⚖️ Design patterns documentation for EducationMaxxingMVP created
+486 7:00p ⚖️ Comprehensive design patterns documentation and UML diagram specifications created
+487 7:36p ✅ Education Maxing MVP development environment initialized
+488 7:37p ✅ Backend API server initialized with Swagger documentation enabled
+489 " 🔵 Frontend UI implementation examined: role-based user management and course workflow
+490 7:38p 🔵 Complete authentication and role-based dashboard UI implementation verified
+491 " 🔵 Browser automation connection timeout on localhost:3001
+492 " 🔵 Browser tab loaded but page content not rendering from Next.js dev server
+493 " 🔵 Next.js dev server process running but unresponsive and producing no output
+494 " 🔵 Page reload detected DOM mismatch; login page UI elements not rendering
+495 7:39p 🔵 Login page URL correct but DOM completely empty; server returning blank page
+496 " 🔵 Development server unresponsive to all HTTP navigation attempts
+497 " 🔵 HTTP request to dev server times out; server not binding to port 3001
+498 " 🔵 Backend API operational while frontend dev server completely hung
+499 7:40p ✅ Frontend dev server restarted after hung state
+500 " ✅ Frontend Next.js dev server successfully recovered and ready
+S83 Complete MVP documentation deliverable: Create .docx file with Section 6.1 (functional scope table), Section 6.2 (detailed demo execution instructions), and Section 6.3 (3+ annotated screenshots with 40+ word descriptions). Capture evidence via browser automation of complete user workflows (admin→professor→course→student→assignment→file upload with error handling). (Jun 24 at 7:46 PM)
+S84 Create comprehensive MVP documentation (.docx file) with Section 6.1 (functional scope table), Section 6.2 (execution instructions), and Section 6.3 (3+ annotated screenshots with 40+ word descriptions). Execute complete user workflow automation (admin→professor→course→student→assignment→file upload) with screenshot evidence. (Jun 24 at 7:52 PM)
+538 7:56p 🟣 MVP Automated Demo Flow with Playwright
+539 7:57p 🔵 Playwright Selector Ambiguity in Professor Registration Flow
+540 7:58p 🔴 Fixed Playwright Selector Ambiguity with Exact Match
+541 " 🔵 MVP Core Workflow Execution Success
+542 " 🔵 Next.js Dev Overlay Blocking Automation Clicks
+543 7:59p 🔴 Logout Function Resilience Against Dev Overlay Portal Interception
+544 " 🔵 Logout Click Succeeds But Navigation to Login Page Incomplete
+545 8:00p 🔴 Logout Navigation Timing and Conditional Fallback Logic
+546 8:01p 🔵 Complete MVP End-to-End Workflow Validation Success
+547 " 🔵 Student Course Enrollment Display Issue
+548 8:02p 🔄 Demo enrollment flow refactored to resolve IDs via backend API
+549 8:03p 🔵 Demo flow authentication token becomes invalid for admin API calls
+550 " 🔴 Fixed demo flow to use correct localStorage token key name
+551 " 🔵 Demo flow progresses through setup but fails on student submission endpoint
+552 8:04p 🔵 Demo flow completes successfully end-to-end
+553 8:05p 🟣 Document Generation Script for MVP Demo Documentation
+554 8:07p 🔴 Fixed python-docx table width property access error
+555 " ✅ MVP Documentation Word Document Generated Successfully
+556 " 🔵 pdf2image module required for DOCX to PDF conversion
+557 " 🔵 LibreOffice soffice tool required for DOCX-to-PDF conversion
+558 " 🔵 System has macOS textutil but not LibreOffice soffice
+559 " 🔵 DOCX document successfully generated with embedded images; macOS qlmanage used for preview
 
-Access 484k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 312k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
