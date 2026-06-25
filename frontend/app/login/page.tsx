@@ -1,9 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { setToken } from '@/lib/auth'
+
+const subscribe = () => () => {}
+const getClientSnapshot = () => true
+const getServerSnapshot = () => false
 
 export default function LoginPage() {
   const router = useRouter()
@@ -11,6 +15,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -25,6 +30,10 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!mounted) {
+    return <div style={{ minHeight: '100vh', background: 'var(--cream)' }} />
   }
 
   return (
@@ -139,13 +148,14 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="anim-fade-up delay-2" style={{ marginBottom: 16 }}>
+            <div className="anim-fade-up delay-2" style={{ marginBottom: 16 }} suppressHydrationWarning>
               <label style={{
                 display: 'block', fontSize: '0.72rem', fontWeight: 700,
                 color: 'var(--forest)', marginBottom: 8,
                 letterSpacing: '0.08em', textTransform: 'uppercase',
               }}>Email</label>
               <input
+                suppressHydrationWarning
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -164,13 +174,14 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="anim-fade-up delay-3" style={{ marginBottom: 6 }}>
+            <div className="anim-fade-up delay-3" style={{ marginBottom: 6 }} suppressHydrationWarning>
               <label style={{
                 display: 'block', fontSize: '0.72rem', fontWeight: 700,
                 color: 'var(--forest)', marginBottom: 8,
                 letterSpacing: '0.08em', textTransform: 'uppercase',
               }}>Password</label>
               <input
+                suppressHydrationWarning
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

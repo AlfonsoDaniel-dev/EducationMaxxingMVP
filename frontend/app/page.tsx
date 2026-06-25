@@ -317,7 +317,7 @@ export default function LandingPage() {
         <section id="roles" style={{ maxWidth: 1120, margin: '0 auto', padding: '96px 40px' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontFamily: 'var(--font-jakarta)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--terracotta)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 14 }}>
-              Who it's for
+              Who it&apos;s for
             </p>
             <h2 style={{
               fontFamily: 'var(--font-fraunces)',
@@ -384,7 +384,7 @@ export default function LandingPage() {
               letterSpacing: '-0.02em',
               margin: 0,
             }}>
-              "Designed for the full academic lifecycle — from enrollment to evaluation."
+              &ldquo;Designed for the full academic lifecycle — from enrollment to evaluation.&rdquo;
             </blockquote>
           </div>
           <div>

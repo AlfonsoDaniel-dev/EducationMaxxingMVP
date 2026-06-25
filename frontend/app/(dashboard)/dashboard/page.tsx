@@ -222,7 +222,7 @@ function StudentDashboard() {
       </div>
       {courses.length === 0 ? (
         <div className="anim-fade-up delay-1" style={{ background: 'var(--card)', border: '1.5px dashed var(--sand)', borderRadius: 16, padding: '52px 32px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--brown)', fontSize: '0.95rem' }}>You haven't been enrolled in any courses yet.</p>
+          <p style={{ color: 'var(--brown)', fontSize: '0.95rem' }}>You haven&apos;t been enrolled in any courses yet.</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 20 }}>

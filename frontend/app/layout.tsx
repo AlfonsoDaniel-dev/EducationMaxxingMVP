@@ -27,6 +27,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${fraunces.variable} ${jakarta.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

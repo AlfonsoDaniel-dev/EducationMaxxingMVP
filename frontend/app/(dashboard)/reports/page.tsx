@@ -11,6 +11,15 @@ const RISK: Record<RiskLevel, { label: string; color: string; bg: string; border
   high:   { label: 'At Risk',     color: '#A83210', bg: '#FEF2EF', border: '#F5C4B4', ring: '#D95A28', emoji: '⚠' },
 }
 
+function StudentReportHeader() {
+  return (
+    <div className="anim-fade-up delay-0" style={{ marginBottom: 40 }}>
+      <p style={{ color: 'var(--brown)', fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>Academic</p>
+      <h1 style={{ fontFamily: 'var(--font-fraunces)', fontSize: '2.3rem', fontWeight: 600, color: 'var(--forest)', letterSpacing: '-0.025em' }}>My Progress</h1>
+    </div>
+  )
+}
+
 // ── Admin: all reports list ────────────────────────────────────────
 function AdminReports() {
   const [reports, setReports] = useState<ReportResponse[]>([])
@@ -98,13 +107,6 @@ function StudentReport() {
     api.reports.latestMine().then(setReport).catch(() => setNotFound(true)).finally(() => setLoading(false))
   }, [])
 
-  const PageHeader = () => (
-    <div className="anim-fade-up delay-0" style={{ marginBottom: 40 }}>
-      <p style={{ color: 'var(--brown)', fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>Academic</p>
-      <h1 style={{ fontFamily: 'var(--font-fraunces)', fontSize: '2.3rem', fontWeight: 600, color: 'var(--forest)', letterSpacing: '-0.025em' }}>My Progress</h1>
-    </div>
-  )
-
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--brown)' }}>
       <div className="spinner" /><span style={{ fontSize: '0.88rem' }}>Loading…</span>
@@ -113,7 +115,7 @@ function StudentReport() {
 
   if (notFound || !report) return (
     <div>
-      <PageHeader />
+      <StudentReportHeader />
       <div className="anim-fade-up delay-1" style={{ background: 'var(--card)', border: '1.5px dashed var(--sand)', borderRadius: 16, padding: '52px 32px', textAlign: 'center' }}>
         <p style={{ color: 'var(--brown)', fontSize: '0.95rem', marginBottom: 6 }}>No reports generated yet.</p>
         <p style={{ color: 'var(--sand-dark)', fontSize: '0.82rem' }}>Reports are generated automatically as you submit assignments.</p>
@@ -129,7 +131,7 @@ function StudentReport() {
 
   return (
     <div style={{ maxWidth: 560 }}>
-      <PageHeader />
+      <StudentReportHeader />
       <div className="anim-fade-up delay-1" style={{ background: 'var(--card)', border: '1.5px solid var(--sand)', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 20px rgba(26,44,30,0.07)' }}>
         <div style={{ background: risk.bg, borderBottom: `1px solid ${risk.border}`, padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ background: risk.border, color: risk.color, borderRadius: 20, padding: '4px 14px', fontSize: '0.76rem', fontWeight: 700, letterSpacing: '0.05em' }}>{risk.emoji} {risk.label}</span>
